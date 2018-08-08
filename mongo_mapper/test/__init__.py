@@ -13,4 +13,4 @@ def run_test():
     print('Find object Room by PK: {{code: {code}, name: {name} }}'.format(code=room1.code, name=room1.name))
 
 
-run_test()
+# run_test()

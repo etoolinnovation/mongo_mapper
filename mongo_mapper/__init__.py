@@ -23,7 +23,14 @@ class MongoMapper:
 
     def save(self):
         self.__check_collection()
-        self.__collection.save(self)
+        self.__collection.save(self.to_dict())
+
+    def to_dict(self):
+        object_dict = {}
+        for property, value in vars(self).items():
+            if not property.startswith("_MongoMapper_"):
+                object_dict[property] = value
+        return object_dict
 
     def delete(self): pass
 
