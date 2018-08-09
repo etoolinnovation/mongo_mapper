@@ -1,12 +1,10 @@
 from mongo_mapper.core.connection import get_collection
 from mongo_mapper.core.id_manager import IdType, get_id
-from mongo_mapper.exceptions import DocumentNotFound
+from mongo_mapper.finder import Finder
+from mongo_mapper.writer import Writer
 
 from bson import DBRef
 from bson.objectid import ObjectId
-from mongo_mapper.core.id_manager import IdType
-from mongo_mapper.finder import Finder
-from mongo_mapper.writer import Writer
 
 
 class Document:
@@ -21,14 +19,15 @@ class Document:
 
         self.__collection = None
         self.__fields = None
+
+        self.__finder = Finder(self)
+        self.__writer = Writer(self)
+
         self.id = None
 
     @property
     def collection_name(self):
         return self.__collection_name
-
-        self.__finder = Finder(self)
-        self.__writer = Writer(self)
 
     def find_by_id(self, _id):
         doc = self.__finder.find_by_id(_id)
@@ -44,18 +43,13 @@ class Document:
     def delete(self):
         return self.__writer.delete()
 
+    def remote_set(self): pass
+
     def to_dict(self):
         object_dict = {}
         for field in self.get_fields():
             object_dict[field] = getattr(self, field)
         return object_dict
-
-    def remote_set(self): pass
-
-    def __set_document__(self, document):
-        for field in self.get_fields():
-            setattr(self, field, document[field])
-        self.id = document['_id']
 
     def get_fields(self):
         if self.__fields is None:
@@ -66,10 +60,14 @@ class Document:
     def get_collection(self):
 
         if self.__collection is None:
-            self.__collection = get_collection(self.__alias, self.__collection_name)
+            self.__collection = get_collection(self.__alias, self.collection_name)
 
         return self.__collection
 
+    def __set_document__(self, document):
+        for field in self.get_fields():
+            setattr(self, field, document[field])
+        self.id = document['_id']
 
 
 class DocumentEmbedded:
