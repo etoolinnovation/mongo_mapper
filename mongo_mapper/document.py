@@ -4,6 +4,9 @@ from mongo_mapper.exceptions import DocumentNotFound
 
 from bson import DBRef
 from bson.objectid import ObjectId
+from mongo_mapper.core.id_manager import IdType
+from mongo_mapper.finder import Finder
+from mongo_mapper.writer import Writer
 
 
 class Document:
@@ -18,60 +21,55 @@ class Document:
 
         self.__collection = None
         self.__fields = None
-
         self.id = None
 
     @property
     def collection_name(self):
         return self.__collection_name
 
+        self.__finder = Finder(self)
+        self.__writer = Writer(self)
+
+    def find_by_id(self, _id):
+        doc = self.__finder.find_by_id(_id)
+        self.__set_document__(doc)
+
     def find_by_pk(self, *kwargs):
-        self.__check_collection__()
-        self.__check_fields__()
-        args = {}
-        for idx, pk in enumerate(self.__pk_fields):
-            args[pk] = kwargs[idx]
-        doc = self.__collection.find(args).limit(1)
-        try:
-            doc = doc[0]
-        except IndexError:
-            raise DocumentNotFound("{} not found".format(self.__collection_name))
+        doc = self.__finder.find_id_by_key(kwargs)
         self.__set_document__(doc)
 
     def save(self):
-        self.__check_collection__()
-        _id = get_id(self.__id_type, self.__collection_name)
-        doc = self.to_dict()
-        doc["_id"] = _id
-        self.__collection.save(doc)
-        self.id = _id
+        self.__writer.save()
+
+    def delete(self):
+        return self.__writer.delete()
 
     def to_dict(self):
-        self.__check_fields__()
         object_dict = {}
-        for field in self.__fields:
+        for field in self.get_fields():
             object_dict[field] = getattr(self, field)
         return object_dict
 
-    def delete(self):
-        self.__check_fields__()
-        self.__check_collection__()
-        result = self.__collection.delete_one({"_id": self.id})
-        return result.acknowledged
-
     def remote_set(self): pass
 
-    def __check_fields__(self):
-        if self.__fields is None:
-            self.__fields = [prop for prop, value in vars(self._Document__document_class.__class__).items() if not prop.startswith("_")]
-
-    def __check_collection__(self):
-        self.__collection = get_collection(self.__alias, self.__collection_name)
-
     def __set_document__(self, document):
-        for field in self.__fields:
+        for field in self.get_fields():
             setattr(self, field, document[field])
         self.id = document['_id']
+
+    def get_fields(self):
+        if self.__fields is None:
+            self.__fields = [prop for prop, value in vars(self.__document_class.__class__).items() if not prop.startswith("_")]
+
+        return self.__fields
+
+    def get_collection(self):
+
+        if self.__collection is None:
+            self.__collection = get_collection(self.__alias, self.__collection_name)
+
+        return self.__collection
+
 
 
 class DocumentEmbedded:
