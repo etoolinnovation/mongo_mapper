@@ -18,6 +18,16 @@ def __add_room(code, sub_code, name):
     return room
 
 
+def __delete_room(room):
+    print('Delete object Room: {{code: {code}, code_dingus: {code_dingus}, name: {name}, id: {id} }}'.format(
+        code=room.code,
+        code_dingus=room.sub_code,
+        name=room.name,
+        id=room.id)
+    )
+    room.delete()
+
+
 def __add_extra(code, sub_code, name):
     extra = Extra()
     extra.code = code
@@ -33,14 +43,24 @@ def __add_extra(code, sub_code, name):
 
 def __find_room(code, sub_code):
     room = Room()
-    room.find_by_pk(code, sub_code)
-    print('Find object Room by PK: {{code: {code}, sub_code: {sub_code}, name: {name}, id: {id} }}'.format(
-        code=room.code,
-        sub_code=room.sub_code,
-        name=room.name,
-        id=room.id)
-    )
-    return room
+    try:
+        room.find_by_pk(code, sub_code)
+        print('Find object Room by PK: {{code: {code}, sub_code: {sub_code}, name: {name}, id: {id} }}'.format(
+            code=room.code,
+            sub_code=room.sub_code,
+            name=room.name,
+            id=room.id)
+        )
+        return room
+    except DocumentNotFound as e:
+        print('Find object Room {{code: {code}, sub_code: {sub_code}, name: {name}, id: {id} }} by PK raise: {ex}'.
+            format(
+            code=room.code,
+            sub_code=room.sub_code,
+            name=room.name,
+            id=room.id,
+            ex=e
+        ))
 
 
 def run_test():
@@ -65,26 +85,31 @@ def run_test():
     ]
 
     hotel.save()
-    print('Save object Hotel: {{code: {code}, sub_code: {sub_code}, id: {id}, rooms:{rooms}, extras: {extras} }}'.format(
-        code=hotel.code,
-        sub_code=hotel.sub_code,
-        id=hotel.id,
-        rooms=hotel.rooms,
-        extras=hotel.extras)
+    print(
+        'Save object Hotel: {{code: {code}, sub_code: {sub_code}, id: {id}, rooms:{rooms}, extras: {extras} }}'.format(
+            code=hotel.code,
+            sub_code=hotel.sub_code,
+            id=hotel.id,
+            rooms=hotel.rooms,
+            extras=hotel.extras)
     )
 
-    # print('Delete object Room: {{code: {code}, code_dingus: {code_dingus}, name: {name}, id: {id} }}'.format(
-    #     code=room1.code,
-    #     code_dingus=room1.sub_code,
-    #     name=room1.name,
-    #     id=room1.id)
-    # )
-    # room1.delete()
+    __delete_room(room1)
+    __delete_room(room2)
 
-    # try:
-    #     room1.find_by_pk("code_1", "code_dingus_1")
-    # except DocumentNotFound as e:
-    #     print('Find object Room by PK raise: {}'.format(e))
+    __find_room("room_1", "sub_room_1")
+    __find_room("room_2", "sub_room_2")
+
+    print(
+        'Delete object Hotel: {{code: {code}, sub_code: {sub_code}, id: {id}, rooms:{rooms}, extras: {extras} }}'.format(
+            code=hotel.code,
+            sub_code=hotel.sub_code,
+            id=hotel.id,
+            rooms=hotel.rooms,
+            extras=hotel.extras)
+    )
+
+    hotel.delete()
 
 
 run_test()

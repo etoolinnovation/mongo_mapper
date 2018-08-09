@@ -25,16 +25,33 @@ class Document:
 
         self.id = None
 
+    # TODO: Protected property https://stackoverflow.com/questions/797771/python-protected-attributes
+    # TODO: Access private property https://stackoverflow.com/questions/26318836/getting-parent-private-or-protected-values-from-the-child-class
     @property
     def collection_name(self):
         return self.__collection_name
+
+    @property
+    def pk_fields(self):
+        return self.__pk_fields
+
+    @property
+    def id_type(self):
+        return self.__id_type
+
+    @property
+    def collection(self):
+        if self.__collection is None:
+            self.__collection = get_collection(self.__alias, self.collection_name)
+
+        return self.__collection
 
     def find_by_id(self, _id):
         doc = self.__finder.find_by_id(_id)
         self.__set_document__(doc)
 
     def find_by_pk(self, *kwargs):
-        doc = self.__finder.find_id_by_key(kwargs)
+        doc = self.__finder.find_by_primary_key(*kwargs)
         self.__set_document__(doc)
 
     def save(self):
@@ -56,13 +73,6 @@ class Document:
             self.__fields = [prop for prop, value in vars(self.__document_class.__class__).items() if not prop.startswith("_")]
 
         return self.__fields
-
-    def get_collection(self):
-
-        if self.__collection is None:
-            self.__collection = get_collection(self.__alias, self.collection_name)
-
-        return self.__collection
 
     def __set_document__(self, document):
         for field in self.get_fields():
