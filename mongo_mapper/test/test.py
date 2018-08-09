@@ -1,6 +1,7 @@
 from mongo_mapper.test.hotel import Room, Extra, Hotel
 from mongo_mapper.exceptions import DocumentNotFound
 from mongo_mapper.document import DocumentRef
+from mongo_mapper.config import load_config
 
 
 def __add_room(code, sub_code, name):
@@ -64,6 +65,13 @@ def __find_room(code, sub_code):
 
 
 def run_test():
+    load_config([
+        {
+            "ALIAS": "default",
+            'URL': 'mongodb://10.0.1.155/',
+            'DB_NAME': 'test-mongo_mapper'
+        }
+    ])
     __add_room("room_1", "sub_room_1", "room_name_1")
     __add_room("room_2", "sub_room_2", "room_name_2")
     room1 = __find_room("room_1", "sub_room_1")

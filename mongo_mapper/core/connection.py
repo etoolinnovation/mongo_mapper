@@ -1,6 +1,6 @@
 from pymongo import MongoClient
 from pymongo import ReadPreference
-from mongo_mapper.config import MONGODB_SETTINGS
+import mongo_mapper.config as cfg
 
 
 _connections = {}
@@ -15,7 +15,7 @@ def get_collection(alias, object_name, from_primary=False):
         if alias is None or alias == "":
             alias = "default"
 
-        config = [c for c in MONGODB_SETTINGS if c["ALIAS"] == alias]
+        config = [c for c in cfg.MONGODB_SETTINGS if c["ALIAS"] == alias]
 
         if len(config) is 0:
             raise Exception("{} alias not found in MONGODB_SETTINGS".format(alias))
