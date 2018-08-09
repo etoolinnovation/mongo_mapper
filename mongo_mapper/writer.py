@@ -15,6 +15,7 @@ class Writer:
             doc = self.__document.to_dict()
             doc["_id"] = _id
             result = self.__document.get_collection().insert_one(doc)
+            self.__document.__set_document__(doc)
 
         else:
             doc = self.__document.to_dict()
