@@ -2,6 +2,7 @@ from mongo_mapper.core.connection import get_collection
 from mongo_mapper.core.id_manager import IdType, get_id
 from mongo_mapper.exceptions import DocumentNotFound
 
+from bson import DBRef
 from bson.objectid import ObjectId
 
 
@@ -19,6 +20,10 @@ class Document:
         self.__fields = None
 
         self.id = None
+
+    @property
+    def collection_name(self):
+        return self.__collection_name
 
     def find_by_pk(self, *kwargs):
         self.__check_collection__()
@@ -67,6 +72,23 @@ class Document:
         for field in self.__fields:
             setattr(self, field, document[field])
         self.id = document['_id']
+
+
+class DocumentEmbedded:
+    def to_dict(self):
+        object_dict = {}
+        for prop, value in vars(self).items():
+            object_dict[prop] = value
+        return object_dict
+
+
+class DocumentRef:
+    def __init__(self, document):
+        self.__db_ref = DBRef(collection=document.collection_name, id=document.id)
+
+    @property
+    def db_ref(self):
+        return self.__db_ref
 
 
 class DocumentCollection:
