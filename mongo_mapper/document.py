@@ -1,8 +1,8 @@
 from mongo_mapper.core.connection import get_collection
 from mongo_mapper.core.id_manager import IdType, get_id
 from mongo_mapper.exceptions import DocumentNotFound
-
 from bson.objectid import ObjectId
+from mongo_mapper.finder import Finder
 
 
 class Document:
@@ -17,10 +17,12 @@ class Document:
 
         self.__collection = None
         self.__fields = None
-
         self.id = None
 
+        self.__finder = Finder(self)
+
     def find_by_pk(self, *kwargs):
+        doc = self._
         self.__check_collection__()
         self.__check_fields__()
         args = {}
@@ -60,8 +62,6 @@ class Document:
         if self.__fields is None:
             self.__fields = [prop for prop, value in vars(self._Document__document_class.__class__).items() if not prop.startswith("_")]
 
-    def __check_collection__(self):
-        self.__collection = get_collection(self.__alias, self.__collection_name)
 
     def __set_document__(self, document):
         for field in self.__fields:
