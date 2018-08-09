@@ -1,7 +1,7 @@
-from mongo_mapper import MongoMapper
+from mongo_mapper.document import Document
 
 
-class Room(MongoMapper):
+class Room(Document):
     code = ""
     code_dingus = ""
     name = ""
