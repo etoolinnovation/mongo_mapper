@@ -1,8 +1,9 @@
 from enum import Enum
 import uuid
-from pymongo import MongoClient, ReturnDocument
+from pymongo import ReturnDocument
 from bson.objectid import ObjectId
-from mongo_mapper import get_collection
+from mongo_mapper.core.connection import get_collection
+
 
 class IdType(Enum):
     Numeric, Incremental, ObjectId = 1, 2, 3
@@ -21,10 +22,10 @@ def get_id(id_type, obj_name=None):
         return ObjectId()
 
 
-print (get_id(IdType.Numeric, None))
-print (get_id(IdType.Incremental, 'Hotel'))
-print (get_id(IdType.Incremental, 'Hotel'))
-print (get_id(IdType.Incremental, 'Hotel'))
-print (get_id(IdType.Incremental, 'Hotel'))
+print(get_id(IdType.Numeric, None))
+print(get_id(IdType.Incremental, 'Hotel'))
+print(get_id(IdType.Incremental, 'Hotel'))
+print(get_id(IdType.Incremental, 'Hotel'))
+print(get_id(IdType.Incremental, 'Hotel'))
 
-print (get_id(IdType.ObjectId, 'Hotel'))
+print(get_id(IdType.ObjectId, 'Hotel'))
