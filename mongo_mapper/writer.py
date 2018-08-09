@@ -19,7 +19,7 @@ class Writer:
 
         else:
             doc = self.__document.to_dict()
-            result = self.__document.get_collection().find_one_and_replace(filter={'_id': doc['_id']}, update={"$inc": {'count': 1}}, upsert=True, return_document=ReturnDocument.AFTER)
+            result = self.__document.get_collection().find_one_and_replace(filter={'_id': doc['_id']}, replacement=doc, upsert=True, return_document=ReturnDocument.AFTER)
             self.__document.__set_document__(result)
 
     def delete(self):
