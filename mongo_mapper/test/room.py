@@ -1,4 +1,4 @@
-from mongo_mapper.document import Document
+from mongo_mapper.document import Document, IdType
 
 
 class Room(Document):
@@ -8,5 +8,6 @@ class Room(Document):
 
     _meta = {
         "pk_fields": ["code", "code_dingus"],
-        "alias": "default"
+        "alias": "default",
+        "id_type": IdType.Incremental
     }

@@ -20,12 +20,3 @@ def get_id(id_type, obj_name=None):
         return result['count']
     else:
         return ObjectId()
-
-
-print(get_id(IdType.Numeric, None))
-print(get_id(IdType.Incremental, 'Hotel'))
-print(get_id(IdType.Incremental, 'Hotel'))
-print(get_id(IdType.Incremental, 'Hotel'))
-print(get_id(IdType.Incremental, 'Hotel'))
-
-print(get_id(IdType.ObjectId, 'Hotel'))

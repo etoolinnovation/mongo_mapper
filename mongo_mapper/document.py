@@ -1,4 +1,5 @@
 from mongo_mapper.core.connection import get_collection
+from mongo_mapper.core.id_manager import IdType, get_id
 from mongo_mapper.exceptions import DocumentNotFound
 
 from bson.objectid import ObjectId
@@ -11,7 +12,7 @@ class Document:
         self.__alias = self.__meta["alias"] if "alias" in self.__meta else "default"
         self.__pk_fields = self.__meta["pk_fields"] if "pk_fields" in self.__meta else ["id"]
 
-        self.__id_type = None
+        self.__id_type = self.__meta["id_type"] if "id_type" in self.__meta else IdType.ObjectId
         self.__document_class = self
 
         self.__collection = None
@@ -34,7 +35,7 @@ class Document:
 
     def save(self):
         self.__check_collection__()
-        _id = ObjectId()
+        _id = get_id(self.__id_type, self.__collection_name)
         doc = self.to_dict()
         doc["_id"] = _id
         self.__collection.save(doc)
@@ -57,7 +58,7 @@ class Document:
 
     def __check_fields__(self):
         if self.__fields is None:
-            self.__fields = [prop for prop, value in vars(self._MongoMapper__document_class.__class__).items() if not prop.startswith("_")]
+            self.__fields = [prop for prop, value in vars(self._Document__document_class.__class__).items() if not prop.startswith("_")]
 
     def __check_collection__(self):
         self.__collection = get_collection(self.__alias, self.__collection_name)
