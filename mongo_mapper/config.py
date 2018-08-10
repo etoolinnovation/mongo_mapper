@@ -17,7 +17,7 @@ class __Instance:
     def __init__(self):
         self.__MONGODB_SETTINGS = None
         self.__check_default = False
-    
+
     def create_config(self, configuraton_obj):
         if type(configuraton_obj) is list:
             self.__MONGODB_SETTINGS = []
@@ -34,7 +34,7 @@ class __Instance:
             # load module configuration an search MONGODB_SETTINGS section
             pass
         return self.__MONGODB_SETTINGS
-        
+
     def append_config(self, conf):
         if type(conf) is dict:
             if "ALIAS" in conf and "URL" in conf and "DB_NAME" in conf:
@@ -50,7 +50,3 @@ class __Instance:
 def load_config(configuraton_obj):
     global MONGODB_SETTINGS
     MONGODB_SETTINGS = __Instance().create_config(configuraton_obj)
-
-    
-
-

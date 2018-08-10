@@ -1,7 +1,7 @@
-from mongo_mapper.test.hotel import Room, RoomCol, Extra, Hotel
-from mongo_mapper.exceptions import DocumentNotFound
-from mongo_mapper.document import DocumentRef
 from mongo_mapper.config import load_config
+from mongo_mapper.document import DocumentRef
+from mongo_mapper.exceptions import DocumentNotFound
+from mongo_mapper.test.hotel import Room, RoomCol, Extra, Hotel
 
 
 def __add_room(code, sub_code, name):

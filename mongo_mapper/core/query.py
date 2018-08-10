@@ -49,5 +49,3 @@ class Query:
         value = value.replace('%', '')
 
         return {field: {'$regex': value}}
-
-

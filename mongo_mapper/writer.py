@@ -1,6 +1,6 @@
 from pymongo import ReturnDocument
 
-from mongo_mapper.core.id_manager import IdType, get_id
+from mongo_mapper.core.id_manager import get_id
 from mongo_mapper.exceptions import DocumentNotFound, DuplicatePrimaryKey
 
 

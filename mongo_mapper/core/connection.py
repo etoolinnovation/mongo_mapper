@@ -1,7 +1,9 @@
+import threading
+
 from pymongo import MongoClient
 from pymongo import ReadPreference
+
 import mongo_mapper.config as cfg
-import threading
 
 _connections = {}
 _collections = {}
