@@ -12,6 +12,9 @@ class Query:
 
     @staticmethod
     def eq(field, value):
+        if isinstance(value, str) and '%' in value:
+            return Query.like(field, value)
+
         return {field: value}
 
     @staticmethod
@@ -35,4 +38,16 @@ class Query:
         return {field: {"$lte": value}}
 
     @staticmethod
-    def regex(): pass
+    def like(field, value):
+        if value.startswith('%') and value.endswith('%'):
+            value = '/' + value + '/'
+        elif value.startswith('%'):
+            value = '/' + value + '$/'
+        elif value.endswith('%'):
+            value = '/^' + value + '/'
+
+        value = value.replace('%', '')
+
+        return {field: {'$regex': value}}
+
+
