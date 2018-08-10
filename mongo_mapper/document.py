@@ -1,6 +1,6 @@
 from mongo_mapper.core.connection import get_collection
 from mongo_mapper.core.id_manager import IdType, get_id
-from mongo_mapper.finder import Finder
+from mongo_mapper.finder import Finder, FinderCollection
 from mongo_mapper.writer import Writer
 
 from bson import DBRef
@@ -25,8 +25,6 @@ class Document:
 
         self.id = None
 
-    # TODO: Protected property https://stackoverflow.com/questions/797771/python-protected-attributes
-    # TODO: Access private property https://stackoverflow.com/questions/26318836/getting-parent-private-or-protected-values-from-the-child-class
     @property
     def collection_name(self):
         return self.__collection_name
@@ -98,10 +96,23 @@ class DocumentRef:
 
 
 class DocumentCollection:
-    def find(self): pass
+    def __init__(self, document):
+        self.__document = document
+        self.__finder_collection = FinderCollection(self)
 
-    def count(self): pass
+    @property
+    def collection(self):
+        return self.__document.collection
 
-    def to_list(self): pass
+    def find(self, args):
+        self.__finder_collection.find(args)
 
-    def total(self): pass
+    def count(self, args):
+        self.__finder_collection.count(args)
+
+    def to_list(self):
+        return self.__finder_collection.to_list()
+
+    @property
+    def total(self):
+        return self.__finder_collection.total()

@@ -1,4 +1,4 @@
-from mongo_mapper.test.hotel import Room, Extra, Hotel
+from mongo_mapper.test.hotel import Room, RoomCol, Extra, Hotel
 from mongo_mapper.exceptions import DocumentNotFound
 from mongo_mapper.document import DocumentRef
 from mongo_mapper.config import load_config
@@ -76,6 +76,11 @@ def run_test():
     __add_room("room_2", "sub_room_2", "room_name_2")
     room1 = __find_room("room_1", "sub_room_1")
     room2 = __find_room("room_2", "sub_room_2")
+
+    col_room = RoomCol()
+    col_room.find_by_name("name")
+
+    print("Find collection Room: {}".format(col_room.to_list()))
 
     hotel = Hotel()
     hotel.code = "hotel_1"

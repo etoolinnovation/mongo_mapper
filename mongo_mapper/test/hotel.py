@@ -1,4 +1,4 @@
-from mongo_mapper.document import Document, DocumentEmbedded, IdType
+from mongo_mapper.document import Document, DocumentCollection, DocumentEmbedded, IdType
 
 
 class Room(Document):
@@ -30,3 +30,12 @@ class Hotel(Document):
         "alias": "default",
         "id_type": IdType.Incremental
     }
+
+
+class RoomCol(DocumentCollection):
+    # TODO: revisar forma molona de hacerlo
+    def __init__(self):
+        super().__init__(Room())
+
+    def find_by_name(self, name):
+        self.find({"name": {"$regex": ".*{}.*".format(name)}})
