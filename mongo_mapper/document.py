@@ -104,11 +104,28 @@ class DocumentCollection:
     def collection(self):
         return self.__document.collection
 
+    @property
+    def document(self):
+        return self.__document
+
     def find(self, args):
         self.__finder_collection.find(args)
+        return self
+
+    def skip(self, skip):
+        self.__finder_collection.skip(skip)
+        return self
+
+    def limit(self, limit):
+        self.__finder_collection.limit(limit)
+        return self
+
+    def sort(self, sort):
+        self.__finder_collection.sort(sort)
+        return self
 
     def count(self, args):
-        self.__finder_collection.count(args)
+        return self.__finder_collection.count(args)
 
     def to_list(self):
         return self.__finder_collection.to_list()
@@ -116,3 +133,7 @@ class DocumentCollection:
     @property
     def total(self):
         return self.__finder_collection.total()
+
+    def __iter__(self):
+        for rec in self.__finder_collection:
+            yield rec

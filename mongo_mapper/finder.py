@@ -46,6 +46,28 @@ class FinderCollection:
 
     def find(self, args):
         self.__cursor = self.__document_collection.collection.find(args)
+        return self
+
+    def limit(self, limit):
+        if self.__cursor is None:
+            raise FindCursorNotFound("Find cursor not found")
+        elif limit is not None:
+            self.__cursor = self.__cursor.limit(limit)
+        return self
+
+    def skip(self, skip):
+        if self.__cursor is None:
+            raise FindCursorNotFound("Find cursor not found")
+        elif skip is not None:
+            self.__cursor = self.__cursor.skip(skip)
+        return self
+
+    def sort(self, sort):
+        if self.__cursor is None:
+            raise FindCursorNotFound("Find cursor not found")
+        elif sort is not None:
+            self.__cursor = self.__cursor.sort(sort)
+        return self
 
     def count(self, args):
         return self.__document_collection.collection.count(args)
@@ -53,27 +75,13 @@ class FinderCollection:
     def total(self):
         return self.__document_collection.collection.count()
 
-    def limit(self, limit):
-        if self.__cursor is None:
-            raise FindCursorNotFound("Find cursor not found")
-        else:
-            self.__cursor = self.__cursor.limit(limit)
-
-    def skip(self, skip):
-        if self.__cursor is None:
-            raise FindCursorNotFound("Find cursor not found")
-        else:
-            self.__cursor = self.__cursor.skip(skip)
-
-    def sort(self, sort):
-        if self.__cursor is None:
-            raise FindCursorNotFound("Find cursor not found")
-        else:
-            self.__cursor = self.__cursor.sort(sort)
-
     def __iter__(self):
         for rec in self.__cursor:
-            yield rec
+            document = self.__document_collection.document.__class__()
+            for field in document.get_fields():
+                setattr(document, field, rec[field])
+            document.id = rec["_id"]
+            yield document
 
     def to_list(self):
         collection = []
