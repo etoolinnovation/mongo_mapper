@@ -29,9 +29,9 @@ class Writer:
         else:
             doc = self.__document.to_dict()
             result = self.__document.collection.find_one_and_replace(filter={'_id': doc['_id']},
-                                                                       replacement=doc,
-                                                                       upsert=True,
-                                                                       return_document=ReturnDocument.AFTER)
+                                                                     replacement=doc,
+                                                                     upsert=True,
+                                                                     return_document=ReturnDocument.AFTER)
             self.__document.__set_document__(result)
 
     def delete(self):
