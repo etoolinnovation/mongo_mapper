@@ -1,33 +1,50 @@
 from pymongo import MongoClient
 from pymongo import ReadPreference
 import mongo_mapper.config as cfg
+import threading
 
 _connections = {}
 _collections = {}
+lock = threading.Lock()
 
 
 def get_collection(alias, object_name, from_primary=False):
     key = object_name + '|' + str(from_primary)
 
-    if key not in _collections:
+    if key in _collections:
 
-        if alias is None or alias == "":
-            alias = "default"
+        return _collections[key]
 
-        config = [c for c in cfg.MONGODB_SETTINGS if c["ALIAS"] == alias]
+    else:
 
-        if len(config) is 0:
-            raise Exception("{} alias not found in MONGODB_SETTINGS".format(alias))
-        else:
-            config = config[0]
+        lock.acquire()
 
-        client = MongoClient(config["URL"])
+        try:
 
-        _connections[key] = client
+            if key in _collections:
+                return _collections[key]
 
-        if from_primary:
-            _collections[key] = client.get_database(config['DB_NAME'], read_preference=ReadPreference.PRIMARY)[object_name]
-        else:
-            _collections[key] = client.get_database(config['DB_NAME'])[object_name]
+            if alias is None or alias == "":
+                alias = "default"
 
-    return _collections[key]
+            config = [c for c in cfg.MONGODB_SETTINGS if c["ALIAS"] == alias]
+
+            if len(config) is 0:
+                raise Exception("{} alias not found in MONGODB_SETTINGS".format(alias))
+            else:
+                config = config[0]
+
+            client = MongoClient(config["URL"])
+
+            _connections[key] = client
+
+            if from_primary:
+                _collections[key] = client.get_database(config['DB_NAME'], read_preference=ReadPreference.PRIMARY)[object_name]
+            else:
+                _collections[key] = client.get_database(config['DB_NAME'])[object_name]
+
+            return _collections[key]
+
+        finally:
+
+            lock.release()
