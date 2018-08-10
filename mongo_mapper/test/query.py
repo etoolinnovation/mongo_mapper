@@ -4,5 +4,5 @@ print(Query.eq("hotel_code", "%1%"))
 print(Query.eq("hotel_code", "1%"))
 print(Query.eq("hotel_code", "%1"))
 
-print(Query.add_and(Query.eq("hotel_code", "H1"), Query.gt("value", 1000), Query.ne("category", "5*")))
+print(Query.add_and(Query.eq("hotel_code", "%100%"), Query.gt("value", 1000), Query.ne("category", "5*")))
 
