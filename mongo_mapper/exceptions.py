@@ -4,8 +4,9 @@
 
 
 class FindCursorNotFound:
-    def __init__(self, *args, **kwargs):    # real signature unknown
+    def __init__(self, *args, **kwargs):  # real signature unknown
         pass
+
 
 ############################
 #    Finder Exceptions     #
@@ -13,7 +14,7 @@ class FindCursorNotFound:
 
 
 class DocumentNotFound(Exception):
-    def __init__(self, *args, **kwargs):    # real signature unknown
+    def __init__(self, *args, **kwargs):  # real signature unknown
         pass
 
 
@@ -23,8 +24,9 @@ class DocumentNotFound(Exception):
 
 
 class DuplicatePrimaryKey(Exception):
-    def __init__(self, *args, **kwargs):    # real signature unknown
+    def __init__(self, *args, **kwargs):  # real signature unknown
         pass
+
 
 ############################
 # Configuration Exceptions #
@@ -32,20 +34,20 @@ class DuplicatePrimaryKey(Exception):
 
 
 class DuplicateDefaultAlias(Exception):
-    def __init__(self, *args, **kwargs):    # real signature unknown
+    def __init__(self, *args, **kwargs):  # real signature unknown
         pass
 
 
 class InvalidFormatConfiguration(Exception):
-    def __init__(self, *args, **kwargs):    # real signature unknown
+    def __init__(self, *args, **kwargs):  # real signature unknown
         pass
 
 
 class NotFoundDefaultAliasConfiguration(Exception):
-    def __init__(self, *args, **kwargs):    # real signature unknown
+    def __init__(self, *args, **kwargs):  # real signature unknown
         pass
 
 
 class ConfigurationNotLoaded(Exception):
-    def __init__(self, *args, **kwargs):    # real signature unknown
+    def __init__(self, *args, **kwargs):  # real signature unknown
         pass

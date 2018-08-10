@@ -1,10 +1,9 @@
+from bson import DBRef
+
 from mongo_mapper.core.connection import get_collection
-from mongo_mapper.core.id_manager import IdType, get_id
+from mongo_mapper.core.id_manager import IdType
 from mongo_mapper.finder import Finder, FinderCollection
 from mongo_mapper.writer import Writer
-
-from bson import DBRef
-from bson.objectid import ObjectId
 
 
 class Document:
@@ -58,7 +57,8 @@ class Document:
     def delete(self):
         return self.__writer.delete()
 
-    def remote_set(self): pass
+    def remote_set(self):
+        pass
 
     def to_dict(self):
         object_dict = {}
