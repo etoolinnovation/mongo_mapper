@@ -74,7 +74,8 @@ class Document:
 
     def __set_document__(self, document):
         for field in self.get_fields():
-            setattr(self, field, document[field])
+            if field in document:
+                setattr(self, field, document[field])
         self.id = document['_id']
 
 
