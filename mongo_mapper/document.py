@@ -78,6 +78,12 @@ class Document:
                 setattr(self, field, document[field])
         self.id = document['_id']
 
+    def __getitem__(self, key):
+        return getattr(self, key)
+
+    def __setitem__(self, key, value):
+        setattr(self, key, value)
+
 
 class DocumentEmbedded:
     def to_dict(self):

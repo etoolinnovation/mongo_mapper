@@ -7,7 +7,7 @@ class Finder:
 
     def find_by_id(self, _id):
 
-        doc = self.__document.collection.find({'_id': id}).limit(1)
+        doc = self.__document.collection.find({'_id': _id}).limit(1)
         try:
             doc = doc[0]
             return doc
