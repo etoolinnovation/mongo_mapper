@@ -1,4 +1,18 @@
 ###############################
+#     Document Exceptions     #
+###############################
+
+
+class TypeListNotFound:
+    def __init__(self, *args, **kwargs):  # real signature unknown
+        pass
+
+
+class DocumentRefNotFoundType:
+    def __init__(self, *args, **kwargs):  # real signature unknown
+        pass
+
+###############################
 # FinderCollection Exceptions #
 ###############################
 

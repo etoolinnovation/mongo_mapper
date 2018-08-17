@@ -28,7 +28,7 @@ class Writer:
 
         else:
             doc = self.__document.to_dict()
-            result = self.__document.collection.find_one_and_replace(filter={'_id': doc['_id']},
+            result = self.__document.collection.find_one_and_replace(filter={'_id': self.__document.id},
                                                                      replacement=doc,
                                                                      upsert=True,
                                                                      return_document=ReturnDocument.AFTER)
