@@ -116,7 +116,7 @@ class Document:
                         if type(field["type"]["list_type"]) is DocumentRef:
                             values.append(DBRef(field["type"]["list_type"].db_ref.collection, item))
                         elif hasattr(field["type"]["list_type"], "__set_document__"):
-                            rec = field["type"]["list_type"]
+                            rec = field["type"]["list_type"].__class__()
                             rec.__set_document__(item)
                             values.append(rec)
                         else:
@@ -190,7 +190,7 @@ class DocumentEmbedded:
                         if type(field["type"]["list_type"]) is DocumentRef:
                             values.append(DBRef(field["type"]["list_type"].db_ref.collection, item))
                         elif hasattr(field["type"]["list_type"], "__set_document__"):
-                            rec = field["type"]["list_type"]
+                            rec = field["type"]["list_type"].__class__()
                             rec.__set_document__(item)
                             values.append(rec)
                         else:
