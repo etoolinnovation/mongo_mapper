@@ -233,7 +233,9 @@ class DocumentCollection:
     def document(self):
         return self.__document
 
-    def find(self, args):
+    def find(self, args=None):
+        if args is None:
+            args = {}
         self.__finder_collection.find(args)
         return self
 
