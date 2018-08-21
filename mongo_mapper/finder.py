@@ -7,7 +7,7 @@ class Finder:
 
     def find_by_id(self, _id):
 
-        doc = self.__document.collection.find({'_id': id}).limit(1)
+        doc = self.__document.collection.find({'_id': _id}).limit(1)
         try:
             doc = doc[0]
             return doc
@@ -79,7 +79,8 @@ class FinderCollection:
         for rec in self.__cursor:
             document = self.__document_collection.document.__class__()
             for field in document.get_fields():
-                setattr(document, field, rec[field])
+                if field['name'] in rec:
+                    setattr(document, field['name'], rec[field['name']])
             document.id = rec["_id"]
             yield document
 
