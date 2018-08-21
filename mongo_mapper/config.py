@@ -1,16 +1,16 @@
 from mongo_mapper.exceptions import DuplicateDefaultAlias, InvalidFormatConfiguration, \
     NotFoundDefaultAliasConfiguration, ConfigurationNotLoaded
 
-__MONGODB_SETTINGS = None
+MONGODB_SETTINGS = None
 
 
-@property
-def MONGODB_SETTINGS():
-    global __MONGODB_SETTINGS
-    if __MONGODB_SETTINGS is None:
-        raise ConfigurationNotLoaded('MONGODB SETTINGS not loaded')
-    else:
-        return __MONGODB_SETTINGS
+# @property
+# def MONGODB_SETTINGS():
+#     global __MONGODB_SETTINGS
+#     if __MONGODB_SETTINGS is None:
+#         raise ConfigurationNotLoaded('MONGODB SETTINGS not loaded')
+#     else:
+#         return __MONGODB_SETTINGS
 
 
 class __Instance:

@@ -9,7 +9,7 @@ from mongo_mapper.exceptions import TypeListNotFound, DocumentRefNotFoundType
 
 class Document:
     def __init__(self, **kwds):
-        self.__meta = self._meta if hasattr(self, "_meta") is not None else {}
+        self.__meta = self._meta if hasattr(self, "_meta") else {}
         self.__collection_name = self.__meta["collection_name"] if "collection_name" in self.__meta else self.__class__.__name__.lower()
         self.__alias = self.__meta["alias"] if "alias" in self.__meta else "default"
         self.__pk_fields = self.__meta["pk_fields"] if "pk_fields" in self.__meta else ["id"]
@@ -24,7 +24,7 @@ class Document:
         self.__writer = Writer(self)
 
         self.id = None
-        if kwds is not None:
+        if kwds is not None and kwds:
             self.__set_document__(kwds)
 
 
@@ -115,8 +115,8 @@ class Document:
                     for item in document[field["name"]]:
                         if type(field["type"]["list_type"]) is DocumentRef:
                             values.append(DBRef(field["type"]["list_type"].db_ref.collection, item))
-                        elif len([cls.__name__ for cls in vars()[[field["type"]["list_type"]].__name__].__subclasses__() if cls.__name__ == "DocumentEmbedded"]) > 0:
-                            rec = field["type"]["list_type"]()
+                        elif hasattr(field["type"]["list_type"], "__set_document__"):
+                            rec = field["type"]["list_type"]
                             rec.__set_document__(item)
                             values.append(rec)
                         else:
@@ -136,17 +136,16 @@ class Document:
 
 class DocumentEmbedded:
     def __init__(self, **kwds):
-        self.__meta = self._meta if hasattr(self, "_meta") is not None else {}
+        self.__meta = self._meta if hasattr(self, "_meta") else {}
         self.__fields = None
         self.__document_class = self
-        if kwds is not None:
+        if kwds is not None and kwds:
             self.__set_document__(kwds)
 
     def to_dict(self):
         object_dict = {}
-        fields = [d for d in dir(self) if not d.startswith('__') and d != "to_dict"]
-        for field in fields:
-            value = getattr(self, field)
+        for field in self.get_fields():
+            value = getattr(self, field["name"])
             if type(value) is list:
                 childs = []
                 for rec in value:
@@ -154,9 +153,9 @@ class DocumentEmbedded:
                         childs.append(rec.to_dict())
                     else:
                         childs.append(rec)
-                object_dict[field] = childs
+                object_dict[field["name"]] = childs
             else:
-                object_dict[field] = value
+                object_dict[field["name"]] = value
         return object_dict
 
     def get_fields(self):
@@ -190,8 +189,8 @@ class DocumentEmbedded:
                     for item in document[field["name"]]:
                         if type(field["type"]["list_type"]) is DocumentRef:
                             values.append(DBRef(field["type"]["list_type"].db_ref.collection, item))
-                        elif len([cls.__name__ for cls in vars()[[field["type"]["list_type"]].__class__.__name__].__subclasses__() if cls.__name__ == "DocumentEmbedded"]) > 0:
-                            rec = field["type"]["list_type"]()
+                        elif hasattr(field["type"]["list_type"], "__set_document__"):
+                            rec = field["type"]["list_type"]
                             rec.__set_document__(item)
                             values.append(rec)
                         else:
