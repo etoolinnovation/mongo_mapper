@@ -8,4 +8,4 @@ setup(name='MongoMapper.python',
       author_email='info@etoolinnovation.com',
       license='MIT',
       packages=['mongo_mapper'],
-      zip_safe=False, install_requires=['pymongo', 'bson'])
+      zip_safe=False, install_requires=['pymongo'])
