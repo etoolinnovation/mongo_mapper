@@ -5,7 +5,7 @@ from bson.int64 import Int64
 from bson.objectid import ObjectId
 from pymongo import ReturnDocument
 
-from mongo_mapper.core.connection import get_collection
+from mongo_mapper.core.cache import get_collection
 
 
 class IdType(Enum):

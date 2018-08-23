@@ -1,6 +1,6 @@
 from bson import DBRef
 
-from mongo_mapper.core.connection import get_collection
+from mongo_mapper.core.cache import get_collection, get_fields, get_meta
 from mongo_mapper.core.id_manager import IdType
 from mongo_mapper.finder import Finder, FinderCollection
 from mongo_mapper.writer import Writer
@@ -9,16 +9,17 @@ from mongo_mapper.exceptions import TypeListNotFound, DocumentRefNotFoundType
 
 class Document:
     def __init__(self, **kwds):
-        self.__meta = self._meta if hasattr(self, "_meta") else {}
-        self.__collection_name = self.__meta["collection_name"] if "collection_name" in self.__meta else self.__class__.__name__.lower()
+        self.__document_class = self
+        self.__document_name = self.__class__.__name__
+
+        self.__meta = get_meta(self.__document_class, self.__document_name)
+        self.__collection_name = self.__meta["collection_name"] if "collection_name" in self.__meta else self.__document_name.lower()
         self.__alias = self.__meta["alias"] if "alias" in self.__meta else "default"
         self.__pk_fields = self.__meta["pk_fields"] if "pk_fields" in self.__meta else ["id"]
 
         self.__id_type = self.__meta["id_type"] if "id_type" in self.__meta else IdType.ObjectId
-        self.__document_class = self
 
         self.__collection = None
-        self.__fields = None
 
         self.__finder = Finder(self)
         self.__writer = Writer(self)
@@ -26,7 +27,6 @@ class Document:
         self.id = None
         if kwds is not None and kwds:
             self.__set_document__(kwds)
-
 
     @property
     def collection_name(self):
@@ -66,7 +66,7 @@ class Document:
 
     def to_dict(self):
         object_dict = {}
-        for field in self.get_fields():
+        for field in get_fields(self.__document_class, self.__document_name):
             value = getattr(self, field["name"])
             if type(value) is list:
                 childs = []
@@ -84,31 +84,8 @@ class Document:
     def __dict__(self):
         self.to_dict()
 
-    def get_fields(self):
-        if self.__fields is None:
-            self.__fields = []
-            fields = [
-                prop
-                for prop, value in vars(self.__document_class.__class__).items() if not prop.startswith("_")
-            ]
-            for field in fields:
-                _type = type(getattr(self.__document_class, field))
-                if _type is list:
-                    if field in self.__meta:
-                        _type = {
-                            "list_type": self.__meta[field]['type']
-                        }
-                    else:
-                        raise TypeListNotFound("Not found child type from {}".format(field))
-                self.__fields.append({
-                    "name": field,
-                    "type": _type
-                })
-
-        return self.__fields
-
     def __set_document__(self, document):
-        for field in self.get_fields():
+        for field in get_fields(self.__document_class, self.__document_name):
             if field['name'] in document:
                 if type(field["type"]) is dict and "list_type" in field["type"]:
                     values = []
@@ -136,15 +113,17 @@ class Document:
 
 class DocumentEmbedded:
     def __init__(self, **kwds):
-        self.__meta = self._meta if hasattr(self, "_meta") else {}
-        self.__fields = None
         self.__document_class = self
+        self.__document_name = self.__class__.__name__
+
+        self.__meta = get_meta(self.__document_class, self.__document_name)
+
         if kwds is not None and kwds:
             self.__set_document__(kwds)
 
     def to_dict(self):
         object_dict = {}
-        for field in self.get_fields():
+        for field in get_fields(self.__document_class, self.__document_name):
             value = getattr(self, field["name"])
             if type(value) is list:
                 childs = []
@@ -158,31 +137,8 @@ class DocumentEmbedded:
                 object_dict[field["name"]] = value
         return object_dict
 
-    def get_fields(self):
-        if self.__fields is None:
-            self.__fields = []
-            fields = [
-                prop
-                for prop, value in vars(self.__document_class.__class__).items() if not prop.startswith("_")
-            ]
-            for field in fields:
-                _type = type(getattr(self.__document_class, field))
-                if _type is list:
-                    if field in self.__meta:
-                        _type = {
-                            "list_type": self.__meta[field]['type']
-                        }
-                    else:
-                        raise TypeListNotFound("Not found child type from {}".format(field))
-                self.__fields.append({
-                    "name": field,
-                    "type": _type
-                })
-
-        return self.__fields
-
     def __set_document__(self, document):
-        for field in self.get_fields():
+        for field in get_fields(self.__document_class, self.__document_name):
             if field['name'] in document:
                 if type(field["type"]) is dict and "list_type" in field["type"]:
                     values = []

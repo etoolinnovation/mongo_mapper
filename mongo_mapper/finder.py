@@ -1,4 +1,5 @@
 from mongo_mapper.exceptions import DocumentNotFound, FindCursorNotFound
+from mongo_mapper.core.cache import get_fields
 
 
 class Finder:
@@ -78,7 +79,10 @@ class FinderCollection:
     def __iter__(self):
         for rec in self.__cursor:
             document = self.__document_collection.document.__class__()
-            for field in document.get_fields():
+            document_class = self.__document_collection.document
+            document_name = document_class.__class__.__name__
+
+            for field in get_fields(document_class, document_name):
                 if field['name'] in rec:
                     setattr(document, field['name'], rec[field['name']])
             document.id = rec["_id"]
