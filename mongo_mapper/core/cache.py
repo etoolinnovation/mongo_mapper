@@ -55,9 +55,12 @@ def get_collection(alias, object_name, from_primary=False):
 
 
 def get_meta(document_class, document_name):
-    if document_name in _documents_type and "meta" in _documents_type[document_name]:
 
-        return _documents_type[document_name]["meta"]
+    key = document_name + "|" + document_class.__module__
+
+    if key in _documents_type and "meta" in _documents_type[key]:
+
+        return _documents_type[key]["meta"]
 
     else:
 
@@ -67,12 +70,12 @@ def get_meta(document_class, document_name):
 
             meta = document_class._meta if hasattr(document_class, "_meta") else {}
 
-            if document_name not in _documents_type:
-                _documents_type[document_name] = {"meta": meta}
+            if key not in _documents_type:
+                _documents_type[key] = {"meta": meta}
             else:
-                _documents_type[document_name]["meta"] = meta
+                _documents_type[key]["meta"] = meta
 
-            return _documents_type[document_name]["meta"]
+            return _documents_type[key]["meta"]
         finally:
 
             lock.release()
@@ -80,9 +83,11 @@ def get_meta(document_class, document_name):
 
 def get_fields(document_class, document_name):
 
-    if document_name in _documents_type and "fields" in _documents_type[document_name]:
+    key = document_name + "|" + document_class.__module__
 
-        return _documents_type[document_name]["fields"]
+    if key in _documents_type and "fields" in _documents_type[key]:
+
+        return _documents_type[key]["fields"]
 
     else:
         lock.acquire()
@@ -96,10 +101,10 @@ def get_fields(document_class, document_name):
                 for prop, value in vars(document_class.__class__).items() if not prop.startswith("_")
             ]
 
-            if document_name not in _documents_type:
-                _documents_type[document_name] = {"fields": []}
+            if key not in _documents_type:
+                _documents_type[key] = {"fields": []}
             else:
-                _documents_type[document_name]["fields"] = []
+                _documents_type[key]["fields"] = []
 
             for field in fields:
                 _type = type(getattr(document_class, field))
@@ -110,12 +115,12 @@ def get_fields(document_class, document_name):
                         }
                     else:
                         raise TypeListNotFound("Not found child type from {}".format(field))
-                _documents_type[document_name]["fields"].append({
+                _documents_type[key]["fields"].append({
                     "name": field,
                     "type": _type
                 })
 
-            return _documents_type[document_name]["fields"]
+            return _documents_type[key]["fields"]
 
         finally:
 
