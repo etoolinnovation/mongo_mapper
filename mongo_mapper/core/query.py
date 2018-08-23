@@ -1,3 +1,4 @@
+
 class Query:
 
     @staticmethod
@@ -15,6 +16,21 @@ class Query:
         if isinstance(value, str) and '%' in value:
             return Query.like(field, value)
 
+        if value is None:
+            return Query.add_and({field: value}, Query.field_exist(field, False))
+
+        if isinstance(value, str) and value == '':
+            return Query.add_and({field: value}, Query.field_exist(field, False))
+
+        if isinstance(value, bool) and not value:
+            return Query.add_and({field: value}, Query.field_exist(field, False))
+
+        if isinstance(value, int) and value == 0:
+            return Query.add_and({field: value}, Query.field_exist(field, False))
+
+        if isinstance(value, float) and value == 0.0:
+            return Query.add_and({field: value}, Query.field_exist(field, False))
+
         return {field: value}
 
     @staticmethod
@@ -23,19 +39,47 @@ class Query:
 
     @staticmethod
     def gt(field, value):
+        if isinstance(value, int) and value < 0:
+            return Query.add_and({field: {"$gt": value}}, Query.field_exist(field, False))
+
+        if isinstance(value, float) and value < 0.0:
+            return Query.add_and({field: {"$gt": value}}, Query.field_exist(field, False))
+
         return {field: {"$gt": value}}
 
     @staticmethod
     def gte(field, value):
+        if isinstance(value, int) and value <= 0:
+            return Query.add_and({field: {"$gte": value}}, Query.field_exist(field, False))
+
+        if isinstance(value, float) and value <= 0.0:
+            return Query.add_and({field: {"$gte": value}}, Query.field_exist(field, False))
+
         return {field: {"$gte": value}}
 
     @staticmethod
     def lt(field, value):
+        if isinstance(value, int) and value > 0:
+            return Query.add_and({field: {"$lt": value}}, Query.field_exist(field, False))
+
+        if isinstance(value, float) and value > 0.0:
+            return Query.add_and({field: {"$lt": value}}, Query.field_exist(field, False))
+
         return {field: {"$lt": value}}
 
     @staticmethod
     def lte(field, value):
+        if isinstance(value, int) and value >= 0:
+            return Query.add_and({field: {"$lte": value}}, Query.field_exist(field, False))
+
+        if isinstance(value, float) and value >= 0.0:
+            return Query.add_and({field: {"$lte": value}}, Query.field_exist(field, False))
+
         return {field: {"$lte": value}}
+
+    @staticmethod
+    def field_exist(field, exist):
+        return {field: {'$exists': exist}}
 
     @staticmethod
     def near(field, latitude, longitude, max_distance_in_meters):
@@ -43,7 +87,7 @@ class Query:
         return query
 
     @staticmethod
-    def geo_intersects(field, latitude, longitude ):
+    def geo_intersects(field, latitude, longitude):
         query = {field: {'$geoIntersects': {'$geometry': {'type': 'Point', 'coordinates': [longitude, latitude]}}}}
         return query
 
