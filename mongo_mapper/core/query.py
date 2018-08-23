@@ -38,6 +38,16 @@ class Query:
         return {field: {"$lte": value}}
 
     @staticmethod
+    def near(field, latitude, longitude, max_distance_in_meters):
+        query = {field: {'$near': {'$geometry': {'type': 'Point', 'coordinates': [longitude, latitude]}, '$maxDistance': max_distance_in_meters}}}
+        return query
+
+    @staticmethod
+    def geo_intersects(field, latitude, longitude ):
+        query = {field: {'$geoIntersects': {'$geometry': {'type': 'Point', 'coordinates': [longitude, latitude]}}}}
+        return query
+
+    @staticmethod
     def like(field, value):
         if value.startswith('%') and value.endswith('%'):
             value = '/' + value + '/'
