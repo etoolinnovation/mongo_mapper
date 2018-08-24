@@ -76,8 +76,15 @@ class FinderCollection:
     def total(self):
         return self.__document_collection.collection.count()
 
-    def __iter__(self):
-        for rec in self.__cursor:
+    def next(self):
+        return self.__next__()
+
+    def __next__(self):
+        if self.__cursor.alive:
+            rec = self.__cursor.next()
+            if rec is None:
+                raise StopIteration
+
             document = self.__document_collection.document.__class__()
             document_class = self.__document_collection.document
             document_name = document_class.__class__.__name__
@@ -86,7 +93,7 @@ class FinderCollection:
                 if field['name'] in rec:
                     setattr(document, field['name'], rec[field['name']])
             document.id = rec["_id"]
-            yield document
+            return document
 
     def to_list(self):
         collection = []

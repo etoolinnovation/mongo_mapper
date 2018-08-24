@@ -226,6 +226,11 @@ class DocumentCollection:
     def total(self):
         return self.__finder_collection.total()
 
+    def next(self):
+        return self.__next__()
+
+    def __next__(self):
+        return self.__finder_collection.next()
+
     def __iter__(self):
-        for rec in self.__finder_collection:
-            yield rec
+        return self
