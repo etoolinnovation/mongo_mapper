@@ -1,10 +1,10 @@
 from bson import DBRef
+from bson.objectid import ObjectId
 
 from mongo_mapper.core.cache import get_collection, get_fields, get_meta
 from mongo_mapper.core.id_manager import IdType
 from mongo_mapper.finder import Finder, FinderCollection
 from mongo_mapper.writer import Writer
-from mongo_mapper.exceptions import TypeListNotFound, DocumentRefNotFoundType
 
 
 class Document:
@@ -48,6 +48,9 @@ class Document:
         return self.__collection
 
     def find_by_id(self, _id):
+        if self.id_type == IdType.ObjectId and type(_id) is not ObjectId:
+            _id = ObjectId(_id)
+
         doc = self.__finder.find_by_id(_id)
         self.__set_document__(doc)
 
@@ -91,7 +94,10 @@ class Document:
                     values = []
                     for item in document[field["name"]]:
                         if type(field["type"]["list_type"]) is DocumentRef:
-                            values.append(DBRef(field["type"]["list_type"].db_ref.collection, item))
+                            if type(item) is DBRef:
+                                values.append(item)
+                            else:
+                                values.append(DBRef(field["type"]["list_type"].db_ref.collection, item))
                         elif hasattr(field["type"]["list_type"], "__set_document__"):
                             rec = field["type"]["list_type"].__class__()
                             rec.__set_document__(item)
@@ -144,7 +150,10 @@ class DocumentEmbedded:
                     values = []
                     for item in document[field["name"]]:
                         if type(field["type"]["list_type"]) is DocumentRef:
-                            values.append(DBRef(field["type"]["list_type"].db_ref.collection, item))
+                            if type(item) is DBRef:
+                                values.append(item)
+                            else:
+                                values.append(DBRef(field["type"]["list_type"].db_ref.collection, item))
                         elif hasattr(field["type"]["list_type"], "__set_document__"):
                             rec = field["type"]["list_type"].__class__()
                             rec.__set_document__(item)

@@ -3,12 +3,12 @@
 ###############################
 
 
-class TypeListNotFound:
+class TypeListNotFound(Exception):
     def __init__(self, *args, **kwargs):  # real signature unknown
         pass
 
 
-class DocumentRefNotFoundType:
+class DocumentRefNotFoundType(Exception):
     def __init__(self, *args, **kwargs):  # real signature unknown
         pass
 
@@ -17,7 +17,7 @@ class DocumentRefNotFoundType:
 ###############################
 
 
-class FindCursorNotFound:
+class FindCursorNotFound(Exception):
     def __init__(self, *args, **kwargs):  # real signature unknown
         pass
 
