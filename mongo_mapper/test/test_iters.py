@@ -2,7 +2,7 @@ from mongo_mapper.config import load_config
 from mongo_mapper.document import DocumentRef
 from mongo_mapper.exceptions import DocumentNotFound
 from mongo_mapper.test.hotel import RoomBOCollection, Room
-
+import time
 
 def __add_room(code, sub_code, name):
     room = Room()
@@ -26,6 +26,7 @@ def __find_room(name):
 
 
 def run_test():
+    start = time.time()
     load_config([
         {
             "ALIAS": "default",
@@ -33,14 +34,19 @@ def run_test():
             'DB_NAME': 'test-mongo_mapper'
         }
     ])
-
-    for i in range(2):
+    print("Load config: {}".format(time.time() - start))
+    start = time.time()
+    for i in range(100):
         __add_room("room_{}".format(i), "sub_room_".format(i), "room_name")
+    print("Add 100 rooms: {}".format(time.time() - start))
 
+    start = time.time()
     room_collection = __find_room("room_name")
 
     for room in room_collection:
         room.delete()
+
+    print("Delete 100 rooms: {}".format(time.time() - start))
 
 
 run_test()
