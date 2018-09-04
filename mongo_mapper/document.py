@@ -13,7 +13,8 @@ class Document:
         self.__document_name = self.__class__.__name__
 
         self.__meta = get_meta(self.__document_class, self.__document_name)
-        self.__collection_name = self.__meta["collection_name"] if "collection_name" in self.__meta else self.__document_name.lower()
+        self.__collection_name = self.__meta[
+            "collection_name"] if "collection_name" in self.__meta else self.__document_name.lower()
         self.__alias = self.__meta["alias"] if "alias" in self.__meta else "default"
         self.__pk_fields = self.__meta["pk_fields"] if "pk_fields" in self.__meta else ["id"]
 
@@ -96,6 +97,8 @@ class Document:
                         if type(field["type"]["list_type"]) is DocumentRef:
                             if type(item) is DBRef:
                                 values.append(item)
+                            elif type(item) is dict and "id" in item:
+                                values.append(DBRef(field["type"]["list_type"].db_ref.collection, item['id']))
                             else:
                                 values.append(DBRef(field["type"]["list_type"].db_ref.collection, item))
                         elif hasattr(field["type"]["list_type"], "__set_document__"):
@@ -152,6 +155,8 @@ class DocumentEmbedded:
                         if type(field["type"]["list_type"]) is DocumentRef:
                             if type(item) is DBRef:
                                 values.append(item)
+                            elif type(item) is dict and "id" in item:
+                                values.append(DBRef(field["type"]["list_type"].db_ref.collection, item['id']))
                             else:
                                 values.append(DBRef(field["type"]["list_type"].db_ref.collection, item))
                         elif hasattr(field["type"]["list_type"], "__set_document__"):

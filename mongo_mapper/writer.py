@@ -27,6 +27,7 @@ class Writer:
                 raise DuplicatePrimaryKey("Duplicate primary keys: {}".format(self.__document.pk_fields))
 
         else:
+            self.__document.__set_document__(self.__document.to_dict())
             doc = self.__document.to_dict()
             result = self.__document.collection.find_one_and_replace(filter={'_id': self.__document.id},
                                                                      replacement=doc,
