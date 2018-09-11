@@ -45,7 +45,9 @@ class FinderCollection:
         self.__document_collection = document_collection
         self.__cursor = None
 
-    def find(self, args):
+    def find(self, args, project=None):
+        if project is None:
+            project = {}
         self.__cursor = self.__document_collection.collection.find(args)
         return self
 

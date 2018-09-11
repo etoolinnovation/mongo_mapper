@@ -203,10 +203,12 @@ class DocumentCollection:
     def document(self):
         return self.__document
 
-    def find(self, args=None):
+    def find(self, args=None, project=None):
         if args is None:
             args = {}
-        self.__finder_collection.find(args)
+        if project is None:
+            project = {}
+        self.__finder_collection.find(args, project)
         return self
 
     def skip(self, skip):
