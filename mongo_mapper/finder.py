@@ -46,9 +46,7 @@ class FinderCollection:
         self.__cursor = None
 
     def find(self, args, project=None):
-        if project is None:
-            project = {}
-        self.__cursor = self.__document_collection.collection.find(args)
+        self.__cursor = self.__document_collection.collection.find(filter=args, projection=project)
         return self
 
     def limit(self, limit):

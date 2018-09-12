@@ -206,8 +206,6 @@ class DocumentCollection:
     def find(self, args=None, project=None):
         if args is None:
             args = {}
-        if project is None:
-            project = {}
         self.__finder_collection.find(args, project)
         return self
 
