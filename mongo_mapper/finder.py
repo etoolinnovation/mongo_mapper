@@ -86,13 +86,7 @@ class FinderCollection:
                 raise StopIteration
 
             document = self.__document_collection.document.__class__()
-            document_class = self.__document_collection.document
-            document_name = document_class.__class__.__name__
-
-            for field in get_fields(document_class, document_name):
-                if field['name'] in rec:
-                    setattr(document, field['name'], rec[field['name']])
-            document.id = rec["_id"]
+            document.__set_document__(rec)
             return document
 
     def to_list(self):
