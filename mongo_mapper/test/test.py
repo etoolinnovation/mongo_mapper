@@ -1,5 +1,5 @@
 from mongo_mapper.config import load_config
-from mongo_mapper.document import DocumentRef
+from mongo_mapper.document import DocumentRef, DocumentRefExtended
 from mongo_mapper.exceptions import DocumentNotFound
 from mongo_mapper.test.hotel import Room, RoomCol, Extra, Hotel
 
@@ -88,6 +88,13 @@ def run_test():
     hotel.rooms = [
         DocumentRef(room1).db_ref,
         DocumentRef(room2).db_ref,
+    ]
+
+    room1_extended = DocumentRefExtended(room1)
+    room1_extended.sub_code = "modified by document ref extended"
+
+    hotel.rooms_extended = [
+        room1_extended
     ]
 
     extra1 = __add_extra("extra_1", "sub_extra_1", "extra_name_1")

@@ -7,6 +7,41 @@ from mongo_mapper.finder import Finder, FinderCollection
 from mongo_mapper.writer import Writer
 
 
+def internal_set_document(self, document, document_class, document_name, document_ref_extended=False):
+    for field in get_fields(document_class, document_name):
+        if field['name'] in document:
+            if type(field["type"]) is dict and "list_type" in field["type"]:
+                values = []
+                for item in document[field["name"]]:
+                    if type(field["type"]["list_type"]) is DocumentRef:
+                        if type(item) is DBRef:
+                            values.append(item)
+                        elif type(item) is dict and "id" in item:
+                            values.append(DBRef(field["type"]["list_type"].db_ref.collection, item['id']))
+                        else:
+                            values.append(DBRef(field["type"]["list_type"].db_ref.collection, item))
+                    elif type(field["type"]["list_type"]) is DocumentRefExtended:
+                        rec = DocumentRefExtended(
+                            field["type"]["list_type"]._DocumentRefExtended__document_class_reference()
+                        )
+                        rec.__set_document__(item)
+                        values.append(rec)
+                    elif hasattr(field["type"]["list_type"], "__set_document__"):
+                        rec = field["type"]["list_type"].__class__()
+                        rec.__set_document__(item)
+                        values.append(rec)
+                    else:
+                        values.append(field["type"]["list_type"](item))
+                setattr(self, field["name"], values)
+                if document_ref_extended:
+                    self._DocumentRefExtended__extended_document[field["name"]] = values
+
+            else:
+                setattr(self, field["name"], document[field["name"]])
+                if document_ref_extended:
+                    self._DocumentRefExtended__extended_document[field["name"]] = document[field["name"]]
+
+
 class Document:
     def __init__(self, **kwds):
         self.__document_class = self
@@ -89,27 +124,7 @@ class Document:
         self.to_dict()
 
     def __set_document__(self, document):
-        for field in get_fields(self.__document_class, self.__document_name):
-            if field['name'] in document:
-                if type(field["type"]) is dict and "list_type" in field["type"]:
-                    values = []
-                    for item in document[field["name"]]:
-                        if type(field["type"]["list_type"]) is DocumentRef:
-                            if type(item) is DBRef:
-                                values.append(item)
-                            elif type(item) is dict and "id" in item:
-                                values.append(DBRef(field["type"]["list_type"].db_ref.collection, item['id']))
-                            else:
-                                values.append(DBRef(field["type"]["list_type"].db_ref.collection, item))
-                        elif hasattr(field["type"]["list_type"], "__set_document__"):
-                            rec = field["type"]["list_type"].__class__()
-                            rec.__set_document__(item)
-                            values.append(rec)
-                        else:
-                            values.append(field["type"]["list_type"](item))
-                    setattr(self, field["name"], values)
-                else:
-                    setattr(self, field["name"], document[field["name"]])
+        internal_set_document(self, document, self.__document_class, self.__document_name)
         if "_id" in document:
             self.id = document['_id']
 
@@ -147,27 +162,7 @@ class DocumentEmbedded:
         return object_dict
 
     def __set_document__(self, document):
-        for field in get_fields(self.__document_class, self.__document_name):
-            if field['name'] in document:
-                if type(field["type"]) is dict and "list_type" in field["type"]:
-                    values = []
-                    for item in document[field["name"]]:
-                        if type(field["type"]["list_type"]) is DocumentRef:
-                            if type(item) is DBRef:
-                                values.append(item)
-                            elif type(item) is dict and "id" in item:
-                                values.append(DBRef(field["type"]["list_type"].db_ref.collection, item['id']))
-                            else:
-                                values.append(DBRef(field["type"]["list_type"].db_ref.collection, item))
-                        elif hasattr(field["type"]["list_type"], "__set_document__"):
-                            rec = field["type"]["list_type"].__class__()
-                            rec.__set_document__(item)
-                            values.append(rec)
-                        else:
-                            values.append(field["type"]["list_type"](item))
-                    setattr(self, field["name"], values)
-                else:
-                    setattr(self, field["name"], document[field["name"]])
+        internal_set_document(self, document, self.__document_class, self.__document_name)
         if "_id" in document:
             self.id = document['_id']
 
@@ -188,6 +183,79 @@ class DocumentRef:
     @property
     def db_ref(self):
         return self.__db_ref
+
+
+class DocumentRefExtended:
+    def __init__(self, document, **kwds):
+        self.__document_class = self
+        self.__document_name = self.__class__.__name__
+
+        self.__document_class_reference = document.__class__
+        self.__document_name_reference = document.__class__.__name__
+
+        self.__db_ref = DBRef(collection=document.collection_name, id=document.id)
+        self.__finder = Finder(document)
+
+        self.__document_reference = None
+
+        self.__extended_document = {}
+
+        if kwds is not None and kwds:
+            self.__set_document__(kwds)
+
+    @property
+    def db_ref(self):
+        return self.__db_ref
+
+    @property
+    def extended_document(self):
+        return self.__extended_document
+
+    @extended_document.setter
+    def extended_document(self, value):
+        self.__extended_document = value
+
+    def __load_reference(self):
+        if self.__document_reference is None:
+            self.__document_reference = self.__finder.find_by_id(self.__db_ref.id)
+
+    def __getitem__(self, key):
+        self.__load_reference()
+        if key in self.__extended_document:
+            return self.__extended_document[key]
+        elif key in self.__document_reference:
+            return self.__document_reference[key]
+        else:
+            return None
+
+    def __setitem__(self, key, value):
+        self.__extended_document[key] = value
+
+    def __set_document__(self, document):
+        internal_set_document(self, document, self.__document_class_reference, self.__document_name_reference, document_ref_extended=True)
+        if "db_ref" in document:
+            self.__db_ref = document["db_ref"]
+
+    def to_dict(self):
+        object_dict = {"db_ref": self.__db_ref}
+        internal_fields = dir(self)
+        for field in get_fields(self.__document_class_reference, self.__document_name_reference):
+            if field["name"] in self.__extended_document or field["name"] in internal_fields:
+                if field["name"] in self.__extended_document:
+                    value = self.__extended_document[field["name"]]
+                else:
+                    value = getattr(self, field["name"])
+                if type(value) is list:
+                    childs = []
+                    for rec in value:
+                        if "to_dict" in dir(rec):
+                            childs.append(rec.to_dict())
+                        else:
+                            childs.append(rec)
+                    object_dict[field["name"]] = childs
+                else:
+                    object_dict[field["name"]] = value
+        return object_dict
 
 
 class DocumentCollection:

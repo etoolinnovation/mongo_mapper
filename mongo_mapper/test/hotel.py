@@ -1,4 +1,4 @@
-from mongo_mapper.document import Document, DocumentCollection, DocumentEmbedded, IdType
+from mongo_mapper.document import Document, DocumentCollection, DocumentEmbedded, IdType, DocumentRef, DocumentRefExtended
 
 
 class Room(Document):
@@ -24,11 +24,21 @@ class Hotel(Document):
     sub_code = ""
     extras = []
     rooms = []
+    rooms_extended = []
 
     _meta = {
         "pk_fields": ["code", "sub_code"],
         "alias": "default",
-        "id_type": IdType.Incremental
+        "id_type": IdType.Incremental,
+        "rooms": {
+            "type": DocumentRef(Room())
+        },
+        "extras": {
+            "type": Extra()
+        },
+        "rooms_extended": {
+            "type": DocumentRefExtended(Room())
+        }
     }
 
 
