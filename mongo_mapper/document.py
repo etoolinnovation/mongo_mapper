@@ -289,6 +289,10 @@ class DocumentCollection:
         self.__finder_collection.sort(sort)
         return self
 
+    def distinct(self, field_name):
+        self.__finder_collection.distinct(field_name)
+        return self
+
     def count(self, args):
         return self.__finder_collection.count(args)
 

@@ -70,6 +70,13 @@ class FinderCollection:
             self.__cursor = self.__cursor.sort(sort)
         return self
 
+    def distinct(self, field_name):
+        if self.__cursor is None:
+            raise FindCursorNotFound("Find cursor not found")
+        elif field_name is not None:
+            self.__cursor = self.__cursor.distinct(field_name)
+        return self
+
     def count(self, args):
         return self.__document_collection.collection.count(args)
 
