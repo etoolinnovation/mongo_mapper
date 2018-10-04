@@ -18,6 +18,8 @@ def internal_set_document(self, document, document_class, document_name, documen
                             values.append(item)
                         elif type(item) is dict and "id" in item:
                             values.append(DBRef(field["type"]["list_type"].db_ref.collection, item['id']))
+                        elif hasattr(item, 'id'):
+                            values.append(DBRef(field["type"]["list_type"].db_ref.collection, item.id))
                         else:
                             values.append(DBRef(field["type"]["list_type"].db_ref.collection, item))
                     elif type(field["type"]["list_type"]) is DocumentRefExtended:
@@ -40,6 +42,32 @@ def internal_set_document(self, document, document_class, document_name, documen
                 setattr(self, field["name"], document[field["name"]])
                 if document_ref_extended:
                     self._DocumentRefExtended__extended_document[field["name"]] = document[field["name"]]
+
+def internal_to_dict(self, document_class, document_name):
+    object_dict = {}
+    for field in get_fields(document_class, document_name):
+        value = getattr(self, field["name"])
+        if type(value) is list:
+            childs = []
+            for rec in value:
+                if type(field["type"]["list_type"]) is DocumentRef:
+                    if type(rec) is DBRef:
+                        childs.append(rec)
+                    elif type(rec) is dict and "id" in rec:
+                        childs.append(DBRef(field["type"]["list_type"].db_ref.collection, rec['id']))
+                    elif hasattr(rec, 'id'):
+                        childs.append(DBRef(field["type"]["list_type"].db_ref.collection, rec.id))
+                    else:
+                        childs.append(DBRef(field["type"]["list_type"].db_ref.collection, rec))
+                elif "to_dict" in dir(rec):
+                    childs.append(rec.to_dict())
+                else:
+                    childs.append(rec)
+            object_dict[field["name"]] = childs
+        else:
+            object_dict[field["name"]] = value
+    object_dict["id"] = self.id
+    return object_dict
 
 
 class Document:
@@ -104,21 +132,7 @@ class Document:
         pass
 
     def to_dict(self):
-        object_dict = {}
-        for field in get_fields(self.__document_class, self.__document_name):
-            value = getattr(self, field["name"])
-            if type(value) is list:
-                childs = []
-                for rec in value:
-                    if "to_dict" in dir(rec):
-                        childs.append(rec.to_dict())
-                    else:
-                        childs.append(rec)
-                object_dict[field["name"]] = childs
-            else:
-                object_dict[field["name"]] = value
-        object_dict["id"] = self.id
-        return object_dict
+        return internal_to_dict(self, self.__document_class, self.__document_name)
 
     def __dict__(self):
         self.to_dict()
@@ -146,20 +160,7 @@ class DocumentEmbedded:
             self.__set_document__(kwds)
 
     def to_dict(self):
-        object_dict = {}
-        for field in get_fields(self.__document_class, self.__document_name):
-            value = getattr(self, field["name"])
-            if type(value) is list:
-                childs = []
-                for rec in value:
-                    if "to_dict" in dir(rec):
-                        childs.append(rec.to_dict())
-                    else:
-                        childs.append(rec)
-                object_dict[field["name"]] = childs
-            else:
-                object_dict[field["name"]] = value
-        return object_dict
+        return internal_to_dict(self, self.__document_class, self.__document_name)
 
     def __set_document__(self, document):
         internal_set_document(self, document, self.__document_class, self.__document_name)
@@ -248,7 +249,16 @@ class DocumentRefExtended:
                 if type(value) is list:
                     childs = []
                     for rec in value:
-                        if "to_dict" in dir(rec):
+                        if type(field["type"]["list_type"]) is DocumentRef:
+                            if type(rec) is DBRef:
+                                childs.append(rec)
+                            elif type(rec) is dict and "id" in rec:
+                                childs.append(DBRef(field["type"]["list_type"].db_ref.collection, rec['id']))
+                            elif hasattr(rec, 'id'):
+                                childs.append(DBRef(field["type"]["list_type"].db_ref.collection, rec.id))
+                            else:
+                                childs.append(DBRef(field["type"]["list_type"].db_ref.collection, rec))
+                        elif "to_dict" in dir(rec):
                             childs.append(rec.to_dict())
                         else:
                             childs.append(rec)
