@@ -66,7 +66,8 @@ def internal_to_dict(self, document_class, document_name):
             object_dict[field["name"]] = childs
         else:
             object_dict[field["name"]] = value
-    object_dict["id"] = self.id
+    if hasattr(self, 'id'):
+        object_dict["id"] = self.id
     return object_dict
 
 
