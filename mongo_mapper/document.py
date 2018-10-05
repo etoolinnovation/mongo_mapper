@@ -64,6 +64,15 @@ def internal_to_dict(self, document_class, document_name):
                 else:
                     childs.append(rec)
             object_dict[field["name"]] = childs
+        elif type(field["type"]) is DocumentRef:
+            if type(value) is DBRef:
+                object_dict[field["name"]] = value
+            elif type(value) is dict and "id" in value:
+                object_dict[field["name"]] = DBRef(field["type"].db_ref.collection, value['id'])
+            elif hasattr(value, 'id'):
+                object_dict[field["name"]] = DBRef(field["type"].db_ref.collection, value.id)
+            else:
+                object_dict[field["name"]] = DBRef(field["type"].db_ref.collection, value)
         else:
             object_dict[field["name"]] = value
     if hasattr(self, 'id'):

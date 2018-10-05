@@ -115,6 +115,8 @@ def get_fields(document_class, document_name):
                         }
                     else:
                         raise TypeListNotFound("Not found child type from {}".format(field))
+                elif field in meta:
+                    _type = meta[field]['type']
                 _documents_type[key]["fields"].append({
                     "name": field,
                     "type": _type
