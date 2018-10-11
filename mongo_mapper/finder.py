@@ -19,7 +19,10 @@ class Finder:
 
         args = {}
         for idx, pk in enumerate(self.__document.pk_fields):
-            args[pk] = kwargs[idx]
+            if pk == "id":
+                args["_id"] = kwargs[idx]
+            else:
+                args[pk] = kwargs[idx]
         doc = self.__document.collection.find(args).limit(1)
         try:
             doc = doc[0]
