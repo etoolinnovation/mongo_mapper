@@ -33,6 +33,8 @@ def internal_set_document(self, document, document_class, document_name, documen
                         rec = field["type"]["list_type"].__class__()
                         rec.__set_document__(item)
                         values.append(rec)
+                    elif type(field["type"]["list_type"]) is str:
+                        values.append(item)
                     else:
                         values.append(field["type"]["list_type"](item))
                 setattr(self, field["name"], values)
