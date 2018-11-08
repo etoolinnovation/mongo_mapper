@@ -131,7 +131,10 @@ class Document:
 
     def find_by_id(self, _id):
         if self.id_type == IdType.ObjectId and type(_id) is not ObjectId:
-            _id = ObjectId(_id)
+            if type(_id) is str:
+                _id = ObjectId(_id)
+            elif type(_id) is dict and "value" in _id:
+                _id = ObjectId(_id["value"])
 
         doc = self.__finder.find_by_id(_id)
         self.__set_document__(doc)
