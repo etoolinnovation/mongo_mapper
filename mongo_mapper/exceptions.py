@@ -42,6 +42,15 @@ class DuplicatePrimaryKey(Exception):
         pass
 
 
+class MultiInsertErrorIDSpecified(Exception):
+    def __init__(self, *args, **kwargs):  # real signature unknown
+        pass
+
+
+class MultiInsertDistinctTypes(Exception):
+    def __init__(self, *args, **kwargs):  # real signature unknown
+        pass
+
 ############################
 # Configuration Exceptions #
 ############################

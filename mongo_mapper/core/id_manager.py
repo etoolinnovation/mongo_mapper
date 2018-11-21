@@ -12,17 +12,32 @@ class IdType(Enum):
     Numeric, Incremental, ObjectId = 1, 2, 3
 
 
-def get_id(id_type, obj_name=None):
+def get_id(id_type, obj_name=None, range_ids=1):
     if id_type is IdType.Numeric:
-
-        _id = uuid.uuid1()
-        return Int64(_id.int >> 64)
+        if range_ids == 1:
+            _id = uuid.uuid1()
+            return Int64(_id.int >> 64)
+        else:
+            ids = []
+            for x in range(0, range_ids):
+                _id = uuid.uuid1()
+                ids.append(Int64(_id.int >> 64))
+            return ids
 
     elif id_type is IdType.Incremental:
 
         collection = get_collection('', 'counters', True)
-        result = collection.find_one_and_update(filter={'obj_name': obj_name}, update={"$inc": {'count': 1}}, upsert=True, return_document=ReturnDocument.AFTER)
-        return result['count']
+        result = collection.find_one_and_update(filter={'obj_name': obj_name}, update={"$inc": {'count': range_ids}}, upsert=True, return_document=ReturnDocument.AFTER)
+        if range_ids == 1:
+            return result['count']
+        else:
+            return list(range(result['count'] - range_ids, result['count']))
 
     else:
-        return ObjectId()
+        if range_ids == 1:
+            return ObjectId()
+        else:
+            ids = []
+            for x in range(0,range_ids):
+                ids.append(ObjectId())
+            return ids

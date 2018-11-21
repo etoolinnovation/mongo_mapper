@@ -5,10 +5,7 @@ from mongo_mapper.test.hotel import RoomBOCollection, Room
 import time
 
 def __add_room(code, sub_code, name):
-    room = Room()
-    room.code = code
-    room.sub_code = sub_code
-    room.name = name
+    room = __create_room(code, sub_code, name)
     room.save()
     print('Save object Room: {{code: {code}, sub_code: {sub_code}, name: {name}, id: {id} }}'.format(
         code=room.code,
@@ -18,6 +15,12 @@ def __add_room(code, sub_code, name):
     )
     return room
 
+def __create_room(code, sub_code, name):
+    room = Room()
+    room.code = code
+    room.sub_code = sub_code
+    room.name = name
+    return room
 
 def __find_room(name):
     room_collection = RoomBOCollection()
@@ -47,6 +50,15 @@ def run_test():
         room.delete()
 
     print("Delete 100 rooms: {}".format(time.time() - start))
+
+
+    room_list = []
+    for i in range(100):
+        room_list.append(__create_room("room_{}".format(i), "sub_room_".format(i), "room_name"))
+
+    start = time.time()
+    room_list = Room.multi_insert(room_list)
+    print("Add 100 multiple rooms: {}".format(time.time() - start))
 
 
 run_test()

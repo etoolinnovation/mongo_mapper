@@ -155,6 +155,10 @@ class Document:
     def to_dict(self):
         return internal_to_dict(self, self.__document_class, self.__document_name)
 
+    @staticmethod
+    def multi_insert(documents):
+        return Writer.multi_insert(documents)
+
     def __dict__(self):
         self.to_dict()
 
