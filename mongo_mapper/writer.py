@@ -90,3 +90,22 @@ class Writer:
             args = Query.add_or(*ids_to_delete)
             result = document.collection.delete_many(args)
             return result
+        else:
+            return True
+
+    @staticmethod
+    def multi_update(documents, fields_to_modified):
+        if len(documents) > 0:
+            document = documents[0]
+            ids_to_delete = []
+            for doc in documents:
+                if doc.id is None:
+                    raise MultiDeleteIDNecesary
+                if type(doc) != type(document):
+                    raise DistinctTypes
+
+                ids_to_delete.append(Query.eq("_id", doc.id))
+
+            args = Query.add_or(*ids_to_delete)
+            result = document.collection.update_many(args, fields_to_modified)
+            return result
