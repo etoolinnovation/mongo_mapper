@@ -99,6 +99,14 @@ class FinderCollection:
             document.__set_document__(rec)
             return document
 
+    def __getitem__(self, index):
+        if self.__cursor.alive:
+            rec = self.__cursor[index]
+
+            document = self.__document_collection.document.__class__()
+            document.__set_document__(rec)
+            return document
+
     def to_list(self):
         collection = []
         for rec in self.__cursor:
