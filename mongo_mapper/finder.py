@@ -109,7 +109,7 @@ class FinderCollection:
 
     def __len__(self):
         if self.__cursor.alive:
-            self.__cursor.count()
+            return self.__cursor.count()
 
     def to_list(self):
         collection = []
