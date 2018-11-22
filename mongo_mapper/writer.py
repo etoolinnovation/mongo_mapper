@@ -94,7 +94,7 @@ class Writer:
             return True
 
     @staticmethod
-    def multi_update(documents, fields_to_modified):
+    def multi_update(documents, fields_to_modified, upsert):
         if len(documents) > 0:
             document = documents[0]
             ids_to_delete = []
@@ -107,5 +107,5 @@ class Writer:
                 ids_to_delete.append(Query.eq("_id", doc.id))
 
             args = Query.add_or(*ids_to_delete)
-            result = document.collection.update_many(args, fields_to_modified)
+            result = document.collection.update_many(args, fields_to_modified, upsert)
             return result

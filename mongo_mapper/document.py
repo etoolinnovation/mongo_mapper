@@ -163,6 +163,10 @@ class Document:
     def multi_delete(documents):
         return Writer.multi_delete(documents)
 
+    @staticmethod
+    def multi_update(documents, fields_to_modified, upsert=False):
+        return Writer.multi_update(documents, fields_to_modified, upsert)
+
     def __dict__(self):
         self.to_dict()
 
