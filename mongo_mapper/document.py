@@ -357,3 +357,6 @@ class DocumentCollection:
 
     def __getitem__(self, index):
         return self.__finder_collection[index]
+
+    def __len__(self):
+        return len(self.__finder_collection)

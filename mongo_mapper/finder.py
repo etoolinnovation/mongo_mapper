@@ -107,6 +107,10 @@ class FinderCollection:
             document.__set_document__(rec)
             return document
 
+    def __len__(self):
+        if self.__cursor.alive:
+            self.__cursor.count()
+
     def to_list(self):
         collection = []
         for rec in self.__cursor:
