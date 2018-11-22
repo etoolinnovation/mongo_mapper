@@ -47,7 +47,12 @@ class MultiInsertErrorIDSpecified(Exception):
         pass
 
 
-class MultiInsertDistinctTypes(Exception):
+class DistinctTypes(Exception):
+    def __init__(self, *args, **kwargs):  # real signature unknown
+        pass
+
+
+class MultiDeleteIDNecesary(Exception):
     def __init__(self, *args, **kwargs):  # real signature unknown
         pass
 

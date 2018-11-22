@@ -1,7 +1,9 @@
 from pymongo import ReturnDocument
 
 from mongo_mapper.core.id_manager import get_id
-from mongo_mapper.exceptions import DocumentNotFound, DuplicatePrimaryKey, MultiInsertErrorIDSpecified, MultiInsertDistinctTypes
+from mongo_mapper.exceptions import DocumentNotFound, DuplicatePrimaryKey, MultiInsertErrorIDSpecified, DistinctTypes, \
+    MultiDeleteIDNecesary
+from mongo_mapper.core.query import Query
 
 
 class Writer:
@@ -55,7 +57,7 @@ class Writer:
                 if doc.id is not None:
                     raise MultiInsertErrorIDSpecified
                 if type(doc) != type(document):
-                    raise MultiInsertDistinctTypes
+                    raise DistinctTypes
 
                 _doc = doc.to_dict()
                 _doc['_id'] = _ids[i]
@@ -71,3 +73,20 @@ class Writer:
                     documents[i].id = id
 
         return documents
+
+    @staticmethod
+    def multi_delete(documents):
+        if len(documents) > 0:
+            document = documents[0]
+            ids_to_delete = []
+            for doc in documents:
+                if doc.id is None:
+                    raise MultiDeleteIDNecesary
+                if type(doc) != type(document):
+                    raise DistinctTypes
+
+                ids_to_delete.append(Query.eq("_id", doc.id))
+
+            args = Query.add_or(*ids_to_delete)
+            result = document.collection.delete_many(args)
+            return result

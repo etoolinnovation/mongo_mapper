@@ -159,6 +159,10 @@ class Document:
     def multi_insert(documents):
         return Writer.multi_insert(documents)
 
+    @staticmethod
+    def multi_delete(documents):
+        return Writer.multi_delete(documents)
+
     def __dict__(self):
         self.to_dict()
 

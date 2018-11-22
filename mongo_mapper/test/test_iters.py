@@ -60,5 +60,9 @@ def run_test():
     room_list = Room.multi_insert(room_list)
     print("Add 100 multiple rooms: {}".format(time.time() - start))
 
+    start = time.time()
+    Room.multi_delete(room_list)
+    print("Delete 100 multiple rooms: {}".format(time.time() - start))
+
 
 run_test()
