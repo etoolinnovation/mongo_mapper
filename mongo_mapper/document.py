@@ -6,8 +6,8 @@ from mongo_mapper.core.id_manager import IdType
 from mongo_mapper.finder import Finder, FinderCollection
 from mongo_mapper.writer import Writer
 from enum import EnumMeta
-import datetime, pytz
-
+import pytz
+from datetime import datetime, date
 
 def internal_set_document(self, document, document_class, document_name, document_ref_extended=False):
     for field in get_fields(document_class, document_name):
@@ -68,8 +68,10 @@ def internal_to_dict(self, document_class, document_name):
                 else:
                     childs.append(rec)
             object_dict[field["name"]] = childs
-        elif type(value) is datetime.datetime:
+        elif type(value) is datetime:
             object_dict[field["name"]] = value.astimezone(pytz.utc)
+        elif type(value) is date:
+            object_dict[field["name"]] = datetime.combine(value, datetime.min.time())
         elif type(value).__class__ is EnumMeta:
             object_dict[field["name"]] = value.value
         elif type(field["type"]) is DocumentRef:
