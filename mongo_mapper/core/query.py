@@ -1,3 +1,6 @@
+from bson.regex import Regex
+import re
+
 
 class Query:
 
@@ -94,12 +97,10 @@ class Query:
     @staticmethod
     def like(field, value):
         if value.startswith('%') and value.endswith('%'):
-            value = '/' + value + '/'
+            value = re.compile('.*' + value.replace('%', '') + '.*', re.IGNORECASE)
         elif value.startswith('%'):
-            value = '/' + value + '$/'
+            value = re.compile(value.replace('%', '') + '$', re.IGNORECASE)
         elif value.endswith('%'):
-            value = '/^' + value + '/'
+            value = re.compile('^' + value.replace('%', ''), re.IGNORECASE)
 
-        value = value.replace('%', '')
-
-        return {field: {'$regex': value}}
+        return {field: {'$regex': Regex.from_native(value)}}
