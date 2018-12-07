@@ -2,7 +2,7 @@ from bson import DBRef
 from bson.objectid import ObjectId
 
 from mongo_mapper.core.cache import get_collection, get_fields, get_meta
-from mongo_mapper.core.id_manager import IdType
+from mongo_mapper.core.id_manager import IdType, get_id
 from mongo_mapper.finder import Finder, FinderCollection
 from mongo_mapper.writer import Writer
 from enum import EnumMeta
@@ -191,16 +191,24 @@ class DocumentEmbedded:
 
         self.__meta = get_meta(self.__document_class, self.__document_name)
 
+        if "id_type" in self.__meta:
+            self.__id_type = self.__meta["id_type"]
+            self.id = None
+
         if kwds is not None and kwds:
             self.__set_document__(kwds)
 
     def to_dict(self):
+        if hasattr(self, "id") and self.id is None:
+            self.id = get_id(self.__id_type, self.__document_name)
         return internal_to_dict(self, self.__document_class, self.__document_name)
 
     def __set_document__(self, document):
         internal_set_document(self, document, self.__document_class, self.__document_name)
         if "_id" in document:
             self.id = document['_id']
+        elif "id" in document:
+            self.id = document['id']
 
     def __dict__(self):
         self.to_dict()

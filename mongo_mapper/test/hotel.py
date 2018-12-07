@@ -18,6 +18,10 @@ class Extra(DocumentEmbedded):
     sub_code = ""
     name = ""
 
+    _meta = {
+        "id_type": IdType.ObjectId
+    }
+
 
 class Hotel(Document):
     code = ""
