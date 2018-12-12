@@ -1,4 +1,5 @@
 import threading
+import types
 
 from pymongo import MongoClient
 from pymongo import ReadPreference
@@ -98,7 +99,9 @@ def get_fields(document_class, document_name):
 
             fields = [
                 prop
-                for prop, value in vars(document_class.__class__).items() if not prop.startswith("_")
+                for prop, value in vars(document_class.__class__).items() if not prop.startswith("_") and
+                                                                             type(value) is not staticmethod and
+                                                                             not isinstance(value, types.FunctionType)
             ]
 
             if key not in _documents_type:
