@@ -7,7 +7,7 @@ from mongo_mapper.finder import Finder, FinderCollection
 from mongo_mapper.writer import Writer
 from enum import EnumMeta
 import pytz
-from datetime import datetime, date
+from datetime import datetime, date, timezone
 
 def internal_set_document(self, document, document_class, document_name, document_ref_extended=False):
     for field in get_fields(document_class, document_name):
@@ -69,7 +69,7 @@ def internal_to_dict(self, document_class, document_name):
                     childs.append(rec)
             object_dict[field["name"]] = childs
         elif type(value) is datetime:
-            object_dict[field["name"]] = value.astimezone(pytz.utc)
+            object_dict[field["name"]] = value.replace(tzinfo=timezone.utc)
         elif type(value) is date:
             object_dict[field["name"]] = datetime.combine(value, datetime.min.time())
         elif type(value).__class__ is EnumMeta:
