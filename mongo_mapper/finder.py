@@ -98,6 +98,8 @@ class FinderCollection:
             document = self.__document_collection.document.__class__()
             document.__set_document__(rec)
             return document
+        else:
+            raise StopIteration
 
     def __getitem__(self, index):
         if self.__cursor.alive:
