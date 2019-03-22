@@ -10,7 +10,7 @@ class Writer:
     def __init__(self, document):
         self.__document = document
 
-    def save(self):
+    def save(self, replace):
 
         if self.__document.id is None:
             check_pk = False
@@ -36,7 +36,13 @@ class Writer:
             if "id" in doc:
                 doc['_id'] = doc['id']
                 doc.pop("id", None)
-            result = self.__document.collection.find_one_and_replace(filter={'_id': self.__document.id},
+            if replace is False:
+                result = self.__document.collection.find_one_and_update(filter={'_id': self.__document.id},
+                                                                     update={'$set': doc},
+                                                                     upsert=True,
+                                                                     return_document=ReturnDocument.AFTER)
+            else:
+                result = self.__document.collection.find_one_and_replace(filter={'_id': self.__document.id},
                                                                      replacement=doc,
                                                                      upsert=True,
                                                                      return_document=ReturnDocument.AFTER)
