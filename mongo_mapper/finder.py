@@ -90,7 +90,7 @@ class FinderCollection:
         return self.__next__()
 
     def __next__(self):
-        if self.__cursor.alive:
+        if self.__cursor is not None and self.__cursor.alive:
             rec = self.__cursor.next()
             if rec is None:
                 raise StopIteration
