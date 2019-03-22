@@ -145,8 +145,8 @@ class Document:
         doc = self.__finder.find_by_primary_key(*kwargs)
         self.__set_document__(doc)
 
-    def save(self):
-        self.__writer.save()
+    def save(self, replace=False):
+        self.__writer.save(replace)
 
     def delete(self):
         return self.__writer.delete()
