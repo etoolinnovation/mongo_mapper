@@ -96,11 +96,12 @@ class Query:
 
     @staticmethod
     def like(field, value):
+        escaped_value = re.escape(value.replace('%', ''))
         if value.startswith('%') and value.endswith('%'):
-            value = re.compile('.*' + value.replace('%', '') + '.*', re.IGNORECASE)
+            value = re.compile('.*' + escaped_value + '.*', re.IGNORECASE)
         elif value.startswith('%'):
-            value = re.compile(value.replace('%', '') + '$', re.IGNORECASE)
+            value = re.compile(escaped_value + '$', re.IGNORECASE)
         elif value.endswith('%'):
-            value = re.compile('^' + value.replace('%', ''), re.IGNORECASE)
+            value = re.compile('^' + escaped_value, re.IGNORECASE)
 
         return {field: {'$regex': Regex.from_native(value)}}
