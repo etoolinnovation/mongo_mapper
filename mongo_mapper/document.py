@@ -330,6 +330,12 @@ class DocumentCollection:
         self.__finder_collection.find(args, project)
         return self
 
+    def aggregate(self, pipeline):
+        if pipeline is None:
+            pipeline = {}
+        self.__finder_collection.aggregate(pipeline)
+        return self
+
     def skip(self, skip):
         self.__finder_collection.skip(skip)
         return self
