@@ -52,8 +52,8 @@ class FinderCollection:
         self.__cursor = self.__document_collection.collection.find(filter=args, projection=project)
         return self
 
-    def aggregate(self, pipeline):
-        self.__cursor = self.__document_collection.collection.aggregate(pipeline)
+    def aggregate(self, pipeline, collation={}):
+        self.__cursor = self.__document_collection.collection.aggregate(pipeline, collation=collation)
         return self
 
     def limit(self, limit):
