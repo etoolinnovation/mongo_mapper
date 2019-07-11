@@ -5,9 +5,11 @@ from mongo_mapper.core.cache import get_collection, get_fields, get_meta
 from mongo_mapper.core.id_manager import IdType, get_id
 from mongo_mapper.finder import Finder, FinderCollection
 from mongo_mapper.writer import Writer
+from mongo_mapper.core.schema_utility import create_index
 from enum import EnumMeta
 import pytz
 from datetime import datetime, date, timezone
+
 
 def internal_set_document(self, document, document_class, document_name, document_ref_extended=False):
     for field in get_fields(document_class, document_name):
@@ -156,6 +158,10 @@ class Document:
 
     def to_dict(self):
         return internal_to_dict(self, self.__document_class, self.__document_name)
+
+    @classmethod
+    def create_indexes(cls, rebuild=False):
+        create_index(cls(), rebuild)
 
     @staticmethod
     def multi_insert(documents):

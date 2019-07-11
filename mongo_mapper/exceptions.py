@@ -79,3 +79,27 @@ class NotFoundDefaultAliasConfiguration(Exception):
 class ConfigurationNotLoaded(Exception):
     def __init__(self, *args, **kwargs):  # real signature unknown
         pass
+
+
+############################
+# Index Create Exceptions #
+############################
+
+class NotFoundFieldsMongoIndex(Exception):
+    def __init__(self, *args, **kwargs):  # real signature unknown
+        pass
+
+
+class TypeErrorFieldsMongoIndex(Exception):
+    def __init__(self, *args, **kwargs):  # real signature unknown
+        pass
+
+
+class FieldNotSpecifiedMongoIndex(Exception):
+    def __init__(self, *args, **kwargs):  # real signature unknown
+        pass
+
+
+class InvalidExpirationValueMongoIndex(Exception):
+    def __init__(self, *args, **kwargs):  # real signature unknown
+        pass
