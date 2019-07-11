@@ -72,6 +72,9 @@ def run_test():
             'DB_NAME': 'test-mongo_mapper'
         }
     ])
+
+    Room.create_indexes(True)
+
     __add_room("room_1", "sub_room_1", "room_name_1")
     __add_room("room_2", "sub_room_2", "room_name_2")
     room1 = __find_room("room_1", "sub_room_1")
@@ -81,6 +84,8 @@ def run_test():
     col_room.find_by_name("name")
 
     print("Find collection Room: {}".format(col_room.to_list()))
+
+    Hotel.create_indexes(True)
 
     hotel = Hotel()
     hotel.code = "hotel_1"

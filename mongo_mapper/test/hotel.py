@@ -1,13 +1,19 @@
 from mongo_mapper.document import Document, DocumentCollection, DocumentEmbedded, IdType, DocumentRef, DocumentRefExtended
-
+from mongo_mapper.indexes import MongoIndex, MongoTTLIndex, Mongo2dIndex, Mongo2dSpehreIndex
+from datetime import datetime
 
 class Room(Document):
     code = ""
     sub_code = ""
     name = ""
+    c_date = datetime.now()
 
     _meta = {
         "pk_fields": ["code", "sub_code"],
+        "indexes": [
+            MongoIndex(["name"]),
+            MongoTTLIndex("c_date", 300)
+        ],
         "alias": "default",
         "id_type": IdType.Incremental
     }
@@ -29,11 +35,16 @@ class Hotel(Document):
     extras = []
     rooms = []
     rooms_extended = []
+    c_date = datetime.now()
 
     _meta = {
         "pk_fields": ["code", "sub_code"],
         "alias": "default",
         "id_type": IdType.Incremental,
+        "indexes": [
+            MongoIndex(["code"]),
+            MongoTTLIndex("c_date", 300)
+        ],
         "rooms": {
             "type": DocumentRef(Room())
         },
