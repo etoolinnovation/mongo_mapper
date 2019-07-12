@@ -10,16 +10,21 @@ DEFAULTS_MONGO_2D_INDEX = {
 
 
 class MongoIndex:
-    def __init__(self, fields=None):
+    def __init__(self, fields=None, unique=False):
         if fields is None:
             raise NotFoundFieldsMongoIndex()
         if type(fields) is not list:
             raise TypeErrorFieldsMongoIndex("Fields has to be array")
         self.__fields = fields
+        self.__unique = unique
 
     @property
     def fields(self):
         return self.__fields
+
+    @property
+    def unique(self):
+        return self.__unique
 
 
 class MongoTTLIndex:
