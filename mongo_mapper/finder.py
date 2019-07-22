@@ -1,5 +1,33 @@
 from mongo_mapper.exceptions import DocumentNotFound, FindCursorNotFound
 from mongo_mapper.core.cache import get_fields
+from datetime import date, datetime
+import pytz
+
+
+def __parse_value_arg__(arg):
+    if type(arg) is date:
+        return datetime(year=arg.year, month=arg.month, day=arg.day, tzinfo=pytz.utc)
+    else:
+        return arg
+
+
+def __parse_values_args__(args):
+    new_args = {}
+    for key in args:
+        if type(args[key]) is dict:
+            new_args[key] = __parse_values_args__(args[key])
+        elif type(args[key]) is list:
+            new_array = []
+            for _arg in args[key]:
+                if type(_arg) is dict or type(_arg) is list:
+                    new_array.append(__parse_values_args__(_arg))
+                else:
+                    new_array.append(__parse_value_arg__(_arg))
+
+            new_args[key] = new_array
+        else:
+            new_args[key] = __parse_value_arg__(args[key])
+    return new_args
 
 
 class Finder:
@@ -49,7 +77,8 @@ class FinderCollection:
         self.__cursor = None
 
     def find(self, args, project=None):
-        self.__cursor = self.__document_collection.collection.find(filter=args, projection=project)
+        mapped_args = __parse_values_args__(args)
+        self.__cursor = self.__document_collection.collection.find(filter=mapped_args, projection=project)
         return self
 
     def aggregate(self, pipeline, collation={}):
