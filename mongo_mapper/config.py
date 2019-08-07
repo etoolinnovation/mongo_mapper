@@ -1,16 +1,8 @@
 from mongo_mapper.exceptions import DuplicateDefaultAlias, InvalidFormatConfiguration, \
     NotFoundDefaultAliasConfiguration, ConfigurationNotLoaded
+import copy
 
 MONGODB_SETTINGS = None
-
-
-# @property
-# def MONGODB_SETTINGS():
-#     global __MONGODB_SETTINGS
-#     if __MONGODB_SETTINGS is None:
-#         raise ConfigurationNotLoaded('MONGODB SETTINGS not loaded')
-#     else:
-#         return __MONGODB_SETTINGS
 
 
 class __Instance:
@@ -57,14 +49,24 @@ class __Instance:
                 raise InvalidFormatConfiguration("Invalid format configuration")
 
 
-def load_config(configuraton_obj):
+def load_config(configuraton_obj, context=""):
     global MONGODB_SETTINGS
-    MONGODB_SETTINGS = __Instance().create_config(configuraton_obj)
 
-
-def add_config(configuraton_obj):
-    global MONGODB_SETTINGS
     if MONGODB_SETTINGS is None:
-        load_config(configuraton_obj)
+        MONGODB_SETTINGS = {context: None}
+    MONGODB_SETTINGS[context] = __Instance().create_config(configuraton_obj)
+
+
+def add_config(configuraton_obj, context=""):
+    global MONGODB_SETTINGS
+
+    cfg = copy.deepcopy(configuraton_obj)
+
+    if MONGODB_SETTINGS is None:
+        MONGODB_SETTINGS = {context: None}
+
+    if context not in MONGODB_SETTINGS or MONGODB_SETTINGS[context] is None:
+        load_config(cfg, context)
     else:
-        MONGODB_SETTINGS = __Instance().create_config(configuraton_obj, MONGODB_SETTINGS)
+        MONGODB_SETTINGS[context] = __Instance().create_config(cfg, MONGODB_SETTINGS[context])
+

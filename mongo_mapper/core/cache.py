@@ -13,8 +13,8 @@ _documents_type = {}
 lock = threading.Lock()
 
 
-def get_collection(alias, object_name, from_primary=False):
-    key = object_name + '|' + str(from_primary)
+def get_collection(alias, object_name, from_primary=False, context=""):
+    key = object_name + '|' + str(from_primary) + '|' + context
 
     if key in _collections:
 
@@ -32,7 +32,7 @@ def get_collection(alias, object_name, from_primary=False):
             if alias is None or alias == "":
                 alias = "default"
 
-            config = [c for c in cfg.MONGODB_SETTINGS if c["ALIAS"] == alias]
+            config = [c for c in cfg.MONGODB_SETTINGS[context] if c["ALIAS"] == alias]
 
             if len(config) is 0:
                 raise Exception("{} alias not found in MONGODB_SETTINGS".format(alias))

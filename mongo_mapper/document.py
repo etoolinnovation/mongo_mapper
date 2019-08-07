@@ -8,6 +8,8 @@ from mongo_mapper.writer import Writer
 from enum import EnumMeta
 import pytz
 from datetime import datetime, date, timezone
+import mongo_mapper.config as cfg
+
 
 def internal_set_document(self, document, document_class, document_name, document_ref_extended=False):
     for field in get_fields(document_class, document_name):
@@ -99,6 +101,7 @@ class Document:
         self.__collection_name = self.__meta[
             "collection_name"] if "collection_name" in self.__meta else self.__document_name.lower()
         self.__alias = self.__meta["alias"] if "alias" in self.__meta else "default"
+        self.__context = self.__meta["context"] if "context" in self.__meta else ""
         self.__pk_fields = self.__meta["pk_fields"] if "pk_fields" in self.__meta else ["id"]
 
         self.__id_type = self.__meta["id_type"] if "id_type" in self.__meta else IdType.ObjectId
@@ -125,9 +128,13 @@ class Document:
         return self.__id_type
 
     @property
+    def context(self):
+        return self.__context
+
+    @property
     def collection(self):
         if self.__collection is None:
-            self.__collection = get_collection(self.__alias, self.collection_name)
+            self.__collection = get_collection(self.__alias, self.collection_name, context=self.context)
 
         return self.__collection
 
@@ -195,12 +202,14 @@ class DocumentEmbedded:
             self.__id_type = self.__meta["id_type"]
             self.id = None
 
+        self.__context = self.__meta["context"] if "context" in self.__meta else ""
+
         if kwds is not None and kwds:
             self.__set_document__(kwds)
 
     def to_dict(self):
         if hasattr(self, "id") and self.id is None:
-            self.id = get_id(self.__id_type, self.__document_name)
+            self.id = get_id(self.__id_type, self.__document_name, context=self.__context)
         return internal_to_dict(self, self.__document_class, self.__document_name)
 
     def __set_document__(self, document):
