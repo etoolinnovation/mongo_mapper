@@ -85,6 +85,10 @@ class FinderCollection:
         self.__cursor = self.__document_collection.collection.aggregate(pipeline)
         return self
 
+    def aggregate(self, pipeline, collation={}):
+        self.__cursor = self.__document_collection.collection.aggregate(pipeline, collation=collation)
+        return self
+
     def limit(self, limit):
         if self.__cursor is None:
             raise FindCursorNotFound("Find cursor not found")

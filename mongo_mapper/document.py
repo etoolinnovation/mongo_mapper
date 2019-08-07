@@ -330,10 +330,10 @@ class DocumentCollection:
         self.__finder_collection.find(args, project)
         return self
 
-    def aggregate(self, pipeline):
+    def aggregate(self, pipeline, collation={}):
         if pipeline is None:
             pipeline = {}
-        self.__finder_collection.aggregate(pipeline)
+        self.__finder_collection.aggregate(pipeline, collation)
         return self
 
     def skip(self, skip):
