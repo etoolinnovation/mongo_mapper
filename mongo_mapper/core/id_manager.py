@@ -12,7 +12,7 @@ class IdType(Enum):
     Numeric, Incremental, ObjectId = 1, 2, 3
 
 
-def get_id(id_type, obj_name=None, range_ids=None):
+def get_id(id_type, obj_name=None, range_ids=None, context=""):
     if id_type is IdType.Numeric:
         if range_ids is None:
             _id = uuid.uuid1()
@@ -26,7 +26,7 @@ def get_id(id_type, obj_name=None, range_ids=None):
 
     elif id_type is IdType.Incremental:
 
-        collection = get_collection('', 'counters', True)
+        collection = get_collection('', 'counters', True, context=context)
         result = collection.find_one_and_update(filter={'obj_name': obj_name},
                                                 update={"$inc": {'count': range_ids if range_ids is not None else 1}},
                                                 upsert=True, return_document=ReturnDocument.AFTER)

@@ -20,7 +20,7 @@ class Writer:
             except DocumentNotFound:
                 check_pk = True
             if check_pk:
-                _id = get_id(self.__document.id_type, self.__document.collection_name)
+                _id = get_id(self.__document.id_type, self.__document.collection_name, context=self.__document.context)
                 doc = self.__document.to_dict()
                 doc["_id"] = _id
                 if "id" in doc:
@@ -58,7 +58,7 @@ class Writer:
             document = documents[0]
             insert_collection = []
 
-            _ids = get_id(document.id_type, document.collection_name, len(documents))
+            _ids = get_id(document.id_type, document.collection_name, len(documents), document.context)
             for i, doc in enumerate(documents):
                 if doc.id is not None:
                     raise MultiInsertErrorIDSpecified
