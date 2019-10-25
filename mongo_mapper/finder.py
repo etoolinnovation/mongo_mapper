@@ -1,6 +1,8 @@
 from mongo_mapper.exceptions import DocumentNotFound, FindCursorNotFound
 from mongo_mapper.core.cache import get_fields
 from datetime import date, datetime
+from bson.regex import Regex
+import re
 import pytz
 
 
@@ -50,7 +52,13 @@ class Finder:
             if pk == "id":
                 args["_id"] = kwargs[idx]
             else:
-                args[pk] = kwargs[idx]
+                is_case_insensitive_pk = 'insensitive_pk_fields' in self.__document._meta and pk in self.__document._meta['insensitive_pk_fields']
+                if not is_case_insensitive_pk:
+                    args[pk] = kwargs[idx]
+                else:
+                    regex = Regex.from_native(re.compile("^" + kwargs[idx] + "$", re.IGNORECASE))
+                    query_insensitive = {"$regex": regex}
+                    args[pk] = query_insensitive
         doc = self.__document.collection.find(args).limit(1)
         try:
             doc = doc[0]
