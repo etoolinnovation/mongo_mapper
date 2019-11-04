@@ -51,6 +51,12 @@ class Finder:
         for idx, pk in enumerate(self.__document.pk_fields):
             if pk == "id":
                 args["_id"] = kwargs[idx]
+            elif pk == 'company_key':
+                company_key_is_list = type(kwargs[idx]) is list
+                if company_key_is_list:
+                    args[pk] = {'$in': kwargs[idx]}
+                else:
+                    args[pk] = kwargs[idx]
             else:
                 is_case_insensitive_pk = 'insensitive_pk_fields' in self.__document._meta and pk in self.__document._meta['insensitive_pk_fields']
                 if not is_case_insensitive_pk:
