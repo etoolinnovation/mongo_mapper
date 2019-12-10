@@ -75,7 +75,7 @@ def internal_to_dict(self, document_class, document_name):
         elif type(value) is datetime:
             object_dict[field["name"]] = value.replace(tzinfo=timezone.utc)
         elif type(value) is date:
-            object_dict[field["name"]] = datetime.combine(value, datetime.min.time())
+            object_dict[field["name"]] = datetime.combine(value, datetime.min.time(), tzinfo=timezone.utc)
         elif type(value).__class__ is EnumMeta:
             object_dict[field["name"]] = value.value
         elif type(field["type"]) is DocumentRef:
@@ -87,6 +87,11 @@ def internal_to_dict(self, document_class, document_name):
                 object_dict[field["name"]] = DBRef(field["type"].db_ref.collection, value.id)
             else:
                 object_dict[field["name"]] = DBRef(field["type"].db_ref.collection, value)
+        elif issubclass(field["type"].__class__, DocumentEmbedded) and value is not None:
+            if type(value) is dict and len(value) == 0:
+                continue
+            else:
+                object_dict[field["name"]] = value.to_dict()
         else:
             object_dict[field["name"]] = value
     if hasattr(self, 'id'):
