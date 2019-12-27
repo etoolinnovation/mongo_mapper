@@ -92,7 +92,7 @@ class FinderCollection:
 
     def find(self, args, project=None):
         mapped_args = __parse_values_args__(args)
-        self.__cursor = self.__document_collection.collection.find(filter=mapped_args, projection=project).collation({"locale": "en"})
+        self.__cursor = self.__document_collection.collection.find(filter=mapped_args, projection=project).collation({"locale": "en", 'numericOrdering': True})
         return self
 
     def aggregate(self, pipeline, collation={}):
